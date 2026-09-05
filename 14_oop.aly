@@ -53,7 +53,6 @@ end
 trait Weapon
     function damage(self): number
     function fire(self, target: Health)
-
     -- A body makes a default. Each implementing struct gets a copy.
     function describe(self): string
         return `weapon dealing {self:damage()}`
@@ -61,7 +60,6 @@ trait Weapon
 end
 
 struct Sword as
-
     read edge: number
     durability: number
 end

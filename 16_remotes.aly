@@ -76,7 +76,7 @@ if RunService:IsServer() then
     GetProfile.on(async function(sender: Player, id: number): Profile
         local store = game:GetService("DataStoreService"):GetDataStore("profiles")
         local raw = store:GetAsync(`profile/{id}`)
-        return new Profile { id = id, name = sender.Name, level = raw and raw.level or 1, tags = [] }
+        return new Profile { id = id, name = sender.Name, level = raw?.level ?? 1, tags = [] }
     end)
 
     JoinTeam.on(function(sender: Player, team: Team)
@@ -84,7 +84,7 @@ if RunService:IsServer() then
     end)
 
     Ping.on(function(sender: Player, sent_at: number)
-        Ping.fire(sender, sent_at)   -- reply to that client only
+        Ping.fire(sender, sent_at) -- reply to that client only
     end)
 
     Toast.fire_all("Server started")
@@ -106,7 +106,7 @@ if RunService:IsClient() then
     local profile = await GetProfile.call(1)
     print(profile)
     local both = await Future.all([ GetProfile.call(2), GetProfile.call(3) ])
-    local safe = try await GetProfile.call(4)   -- Result on timeout or failure
+    local safe = try await GetProfile.call(4) -- Result on timeout or failure
     local pending = GetProfile.call(5)
     pending:cancel()
     Damage.fire(Players.LocalPlayer, 10)

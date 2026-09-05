@@ -5,7 +5,7 @@ import InventoryPanel from "./11_ui"
 import type { Item } from "./02_modules/inventory"
 import * as React from "@packages/react"
 
-local items: Item[] = [{ id = 1, name = "Sword", count = 1 } :: Item]
+local items: Item[] = [ { id = 1, name = "Sword", count = 1 } :: Item ]
 
 local function App()
     return React.createElement(InventoryPanel, { items = items, title = "Bag" })

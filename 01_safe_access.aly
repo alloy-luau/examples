@@ -41,7 +41,7 @@ local spawn = workspace->Map->Spawns->Spawn1
 local points = workspace->"Spawn Points"
 local slot = workspace->`Slot{1}`
 local function child_named(name: string): Instance?
-    return workspace->[name]
+    return workspace->[ name ]
 end
 
 -- `=>` is WaitForChild. It throws on a nil left side, like any method.
@@ -79,4 +79,16 @@ end
 -- `__index` still throws. `?` is not `pcall`.
 local first = Players:GetPlayers()[1]
 print(head_position(first), humanoid_of(first?.Character), map, spawn)
-print(volume(nil), get_or_seed("seed"), lookup(nil, "x"), spawn_cframe(), must_spawn, root_of, health_bar, finish, points, slot, child_named)
+print(
+    volume(nil),
+    get_or_seed("seed"),
+    lookup(nil, "x"),
+    spawn_cframe(),
+    must_spawn,
+    root_of,
+    health_bar,
+    finish,
+    points,
+    slot,
+    child_named
+)

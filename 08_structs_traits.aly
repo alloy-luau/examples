@@ -10,7 +10,6 @@ struct Vec2 as
 end
 
 struct Log as
-
     write sink: (string) -> ()
 end
 
@@ -37,7 +36,6 @@ trait Shape
 end
 
 struct Circle as
-
     radius: number
 end
 

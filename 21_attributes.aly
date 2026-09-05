@@ -45,10 +45,10 @@ local function save(player: Player, health: Health)
 end
 
 -- Reading at runtime. Results are typed from the declaration.
-local field_range = Attributes.field(Health, "current", range)   -- { min: number, max: number }?
-local struct_icon = Attributes.get(Health, icon)                  -- { asset: string }?
+local field_range = Attributes.field(Health, "current", range) -- { min: number, max: number }?
+local struct_icon = Attributes.get(Health, icon) -- { asset: string }?
 local red_icon = Attributes.variant(Team, "Red", icon)
-local on_save = Attributes.of(save)                               -- every attribute on save
+local on_save = Attributes.of(save) -- every attribute on save
 local guarded = Attributes.get(save, server_only) ~= nil
 
 -- A wrong target is a compile error:

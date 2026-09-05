@@ -17,7 +17,6 @@ interface Serializable as
 end
 
 interface SaveData extends Serializable as
-
     coins: number
     items: { string }
 end

@@ -8,7 +8,7 @@ local grid = [ [ 1, 2 ], [ 3, 4 ] ]
 -- `T[]` and `Array<T>` name the same type. `{ T }` is a raw table.
 local a: number[] = [ 1 ]
 local b: Array<number> = a
-local c: { number } = b   -- an Array<T> is accepted as a { T }
+local c: { number } = b -- an Array<T> is accepted as a { T }
 
 -- An array index is a number. Both lines below are compile errors.
 -- xs["foo"] = 1
@@ -17,7 +17,10 @@ local c: { number } = b   -- an Array<T> is accepted as a { T }
 -- Methods and free functions are the same functions.
 local doubled = xs:map(function(x) return x * 2 end)
 local same = Array.map(xs, function(x: number) return x * 2 end)
-local total = xs:filter(function(x) return x % 2 == 1 end):reduce(function(acc: number, x) return acc + x end, 0)
+local total = xs:filter(function(x) return x % 2 == 1 end):reduce(
+    function(acc: number, x) return acc + x end,
+    0
+)
 xs:push(4)
 local last = xs:pop()
 print(#xs, xs:len(), xs:contains(2), last, same)

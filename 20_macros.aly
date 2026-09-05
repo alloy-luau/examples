@@ -45,9 +45,9 @@ end
 -- Usage.
 
 local speed = 24
-local ratio = $clamp01(speed / 16)         -- math.clamp(speed / 16, 0, 1)
-$log(ratio)                                -- print(`[...] ratio = {ratio}`)
-local area = $square(speed + 1)            -- one evaluation of speed + 1
+local ratio = $clamp01(speed / 16) -- math.clamp(speed / 16, 0, 1)
+$log(ratio) -- print(`[...] ratio = {ratio}`)
+local area = $square(speed + 1) -- one evaluation of speed + 1
 $log_squared(ratio)
 local tries = $retry_count()
 
@@ -60,10 +60,10 @@ $dbg(ratio)
 
 type Handler = { on_done: ((number) -> ())?, target: BasePart? }
 local handler: Handler = { on_done = nil, target = nil }
-local part = handler.target!               -- assert, no call
-local size = handler.target!.Size          -- assert, then index
-local done = handler.on_done!(1)           -- assert, then call
-handler.on_done?(2)                        -- call only when present
+local part = handler.target! -- assert, no call
+local size = handler.target!.Size -- assert, then index
+local done = handler.on_done!(1) -- assert, then call
+handler.on_done?(2) -- call only when present
 
 -- `handler.on_done(1)` with no `!` or `?` is the plain call, which
 -- throws on nil like any Luau call.

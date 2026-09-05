@@ -58,7 +58,7 @@ end
 -- the branch for primitives, datatypes, Instance classes, and EnumItems.
 local function describe(value: unknown) -> string
     if value is Part then
-        return value.Name                       -- narrowed to Part
+        return value.Name -- narrowed to Part
     elseif value is Vector3 then
         return tostring(value.Magnitude)
     elseif value is string then
@@ -66,7 +66,7 @@ local function describe(value: unknown) -> string
     elseif value is Enum.KeyCode then
         return value.Name
     elseif value is Menu then
-        return "a menu"                         -- runtime test, no narrowing
+        return "a menu" -- runtime test, no narrowing
     elseif value is not nil then
         return "something"
     end
@@ -143,9 +143,34 @@ enum Tile as
     Wall(number)
 end
 
-print(move, pad("x"), upper, parts, loud, config, finish, can_write, toggled, inverted, back, describe)
+print(
+    move,
+    pad("x"),
+    upper,
+    parts,
+    loud,
+    config,
+    finish,
+    can_write,
+    toggled,
+    inverted,
+    back,
+    describe
+)
 local function collect(into: write number[])
     into:push(1)
 end
 
-print(first, second, head, rest, pair([ 1, 2 ]), spawn_position, part, menu2, total([ 1, 2 ]), collect, Tile.Wall(1) == Tile.Wall(1))
+print(
+    first,
+    second,
+    head,
+    rest,
+    pair([ 1, 2 ]),
+    spawn_position,
+    part,
+    menu2,
+    total([ 1, 2 ]),
+    collect,
+    Tile.Wall(1) == Tile.Wall(1)
+)
