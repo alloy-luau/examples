@@ -30,9 +30,6 @@ impl Health
     function take_damage(self, amount: number)
         self.current = math.max(self.current - amount, 0)
         if self.current == 0 then
-            -- The new solver loses this field's type after the `== 0`
-            -- refinement above; the directive keeps the checker quiet.
-            --@alloy-ignore
             self.on_death?()
         end
     end
