@@ -133,7 +133,7 @@ local menu2 = new Menu {
 
 -- `read T[]` is the covariant read-only array. `write T[]` is a sink.
 local function total(scores: read number[]) -> number
-    return scores:reduce(function(acc, s) return acc + s end, 0)
+    return scores:reduce(function(acc: number, s) return acc + s end, 0)
 end
 
 -- `@derive` on an enum.

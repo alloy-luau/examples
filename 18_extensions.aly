@@ -70,7 +70,7 @@ local clean = "  hello  ":trim()
 
 -- A bounded generic works for structs and foreign types alike.
 local function total_area<T: Shape>(shapes: T[]) -> number
-    return shapes:reduce(function(acc, shape) return acc + shape:area() end, 0)
+    return shapes:reduce(function(acc: number, shape) return acc + shape:area() end, 0)
 end
 
 print(flat, origin, clean, total_area([ new Circle { radius = 1 } ]), total_area([ part ]))
