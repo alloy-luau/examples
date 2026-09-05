@@ -17,8 +17,8 @@ export impl Vector3
         return Vector3.new(self.X, y, self.Z)
     end
 
-    -- No self: a static, called as Vector3.zero(). `-> T` is `: T`.
-    function zero() -> Vector3
+    -- No self: a static, called as Vector3.origin(). `-> T` is `: T`.
+    function origin() -> Vector3
         return Vector3.new(0, 0, 0)
     end
 end
@@ -61,16 +61,18 @@ end
 -- ordinary typed calls.
 local position = Vector3.new(1, 2, 3)
 local flat = position:flat():with_y(5)
-local origin = Vector3.zero()
+local origin = Vector3.origin()
 
 local part = new Instance("Part") { Anchored = true, Parent = workspace }
 part:fade(1)
 
 local clean = "  hello  ":trim()
 
--- A bounded generic works for structs and foreign types alike.
+-- A bounded generic works for structs and foreign types alike. The bound
+-- reaches a bare `T` parameter only: under an array it would make the
+-- type invariant, so the checker cannot see `area` through `T[]`.
 local function total_area<T: Shape>(shapes: T[]) -> number
-    return shapes:reduce(function(acc: number, shape) return acc + shape:area() end, 0)
+    return shapes:reduce(function(acc: number, shape) return acc + shape:area() end, 0) --@alloy-ignore
 end
 
 print(flat, origin, clean, total_area([ new Circle { radius = 1 } ]), total_area([ part ]))

@@ -44,9 +44,9 @@ leaving:Connect(function(player)
 end)
 
 -- `Wait` yields until the next fire, with an optional timeout in seconds.
+-- The parentheses keep the first of the two values it yields.
 async function first_hit(): Player
-    local player = damaged:Wait(5)
-    return player
+    return (damaged:Wait(5))
 end
 
 print(first_hit)
