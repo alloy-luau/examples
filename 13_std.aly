@@ -78,4 +78,26 @@ local parsed: Result<number, string> = Ok(1)
 local value = parsed:map(function(n) return n + 1 end):unwrap_or(0)
 local maybe: number? = parsed:ok()
 
+-- Queue and Heap: a work list and a priority list.
+local jobs = Queue.from([ "load", "spawn", "greet" ])
+jobs:push("save")
+local next_job = jobs:pop()
+
+local open = Heap.new(function(a: { cost: number }, b: { cost: number }) return a.cost < b.cost end)
+open:push({ cost = 9 })
+open:push({ cost = 2 })
+local nearest = open:pop()
+
+-- Scope: a cleanup bag that `delete` drains, newest first.
+local scope = Scope.new()
+local heartbeat = scope:add(game:GetService("RunService").Heartbeat:Connect(function() end))
+scope:add(function() print("scope closed") end)
+delete scope
+
+-- Iter: a lazy chain; nothing runs until `collect` pulls.
+local big_evens = Iter.range(1, 100):filter(function(n) return n % 2 == 0 end):map(
+    function(n) return n * n end
+):take(3):collect()
+
 print(doubled, total, ana, hits, first, value, maybe, buffer, grid, c)
+print(next_job, jobs:len(), nearest, heartbeat, big_evens)
