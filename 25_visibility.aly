@@ -1,0 +1,38 @@
+-- Visibility. A field or an impl method marked `private` belongs to the
+-- struct's own methods. Everything else is public, and `public` is the
+-- word for saying so out loud. Both words are reserved.
+
+struct Counter as
+    read name: string
+    private count: number = 0
+    private history: number[] = []
+end
+
+impl Counter
+    function bump(self): number
+        self.count += 1
+        self:record()
+        return self.count
+    end
+
+    public function peek(self): number
+        return self.count
+    end
+
+    -- Only `bump` and `peek` reach this.
+    private function record(self)
+        self.history:push(self.count)
+    end
+end
+
+local hits = new Counter { name = "hits" }
+hits:bump()
+hits:bump()
+
+-- `hits.count` and `hits:record()` here would be type errors: the public
+-- type of Counter has neither. `alloy lint` says so in this file too.
+print(hits.name, hits:peek())
+
+-- The runtime is plain Luau: `private` compiles to nothing, so the
+-- printer still shows every field.
+print(hits)
