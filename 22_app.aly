@@ -3,7 +3,9 @@
 
 import InventoryPanel from "./11_ui"
 import type { Item } from "./02_modules/inventory"
-import * as React from "@packages/react"
+-- The package is not checked out beside the examples; the directive
+-- keeps the checker quiet about the missing module.
+import * as React from "@packages/react" --@alloy-ignore
 
 local items: Item[] = [ { id = 1, name = "Sword", count = 1 } :: Item ]
 

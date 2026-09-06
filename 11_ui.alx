@@ -1,7 +1,7 @@
 -- JSX on luaux. Markup lowers to the configured UI library.
 -- Every luaux feature carries over. Alloy syntax works inside { } holes.
 
-import * as React from "@packages/react"
+import * as React from "@packages/react" --@alloy-ignore
 import type { Item } from "./02_modules/inventory"
 
 type Props = {

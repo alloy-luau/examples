@@ -17,7 +17,7 @@ import type { Item } from "./inventory"
 import theme from "./theme"
 
 -- `@alias` comes from .luaurc or .config.luau.
-import * as Signal from "@packages/signal"
+import * as Signal from "@packages/signal" --@alloy-ignore
 
 local sword: Item = { id = 1, name = "Sword", count = 1 }
 local bag: Inventory = add({}, sword)
