@@ -3,7 +3,7 @@
 -- word for saying so out loud. Both words are reserved.
 
 struct Counter as
-    read name: string
+    public read name: string
     private count: number = 0
     private history: number[] = []
 end
@@ -28,7 +28,6 @@ end
 local hits = new Counter { name = "hits" }
 hits:bump()
 hits:bump()
-
 -- `hits.count` and `hits:record()` here would be type errors: the public
 -- type of Counter has neither. `alloy lint` says so in this file too.
 print(hits.name, hits:peek())

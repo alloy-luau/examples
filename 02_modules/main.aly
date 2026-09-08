@@ -19,6 +19,11 @@ import theme from "./theme"
 -- `@alias` comes from .luaurc or .config.luau.
 import * as Signal from "@packages/signal" --@alloy-ignore
 
+local _test = 3
+
+async function _testing()
+end
+
 local sword: Item = { id = 1, name = "Sword", count = 1 }
 local bag: Inventory = add({}, sword)
 add_item(bag, sword)

@@ -3,7 +3,7 @@
 
 -- Array literals are one-indexed tables with the shared Array metatable.
 local xs = [ 1, 2, 3 ]
-local grid = [ [ 1, 2 ], [ 3, 4 ] ]
+local grid: Array<number[] | number[]> = [ [ 1, 2 ], [ 3, 4 ] ]
 
 -- `T[]` and `Array<T>` name the same type. `{ T }` is a raw table.
 local a: number[] = [ 1 ]

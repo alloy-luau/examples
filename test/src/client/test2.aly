@@ -1,0 +1,7 @@
+export attribute TestingAttribute on field
+
+export struct TestingStruct as
+    public testingPublicField: number
+    private testingPrivateField: string,
+    testingImplicitPublic: boolean
+end
