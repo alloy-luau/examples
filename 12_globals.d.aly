@@ -21,7 +21,7 @@ interface SaveData extends Serializable as
     items: { string }
 end
 
-trait Codec
+trait Codec as
     function encode(self): string
     function decode(self, raw: string): SaveData
 end

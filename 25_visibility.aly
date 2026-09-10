@@ -8,7 +8,7 @@ struct Counter as
     private history: number[] = []
 end
 
-impl Counter
+impl Counter as
     function bump(self): number
         self.count += 1
         self:record()

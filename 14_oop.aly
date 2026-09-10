@@ -18,7 +18,7 @@ struct Health as
     on_death: (() -> ())?
 end
 
-impl Health
+impl Health as
     -- `new` is a normal function on the class table. `new Health(100)`
     -- calls it. `Health { ... }` is the raw constructor: the class table's
     -- own metatable has `__call`, which sets the instance metatable. A
@@ -50,7 +50,7 @@ end
 
 -- 2. Shared behavior: a trait, and two structs that implement it.
 
-trait Weapon
+trait Weapon as
     function damage(self): number
     function fire(self, target: Health)
     -- A body makes a default. Each implementing struct gets a copy.
@@ -64,13 +64,13 @@ struct Sword as
     durability: number
 end
 
-impl Sword
+impl Sword as
     function new(edge: number): Sword
         return new Sword { edge = edge, durability = 100 }
     end
 end
 
-impl Weapon for Sword
+impl Weapon for Sword as
     function damage(self): number
         return self.edge * (self.durability / 100)
     end
@@ -86,13 +86,13 @@ struct Bow as
     arrows: number
 end
 
-impl Bow
+impl Bow as
     function new(draw: number, arrows: number) -> Bow
         return new Bow { draw = draw, arrows = arrows }
     end
 end
 
-impl Weapon for Bow
+impl Weapon for Bow as
     function damage(self): number
         return self.draw * 2
     end
@@ -133,7 +133,7 @@ struct Character as
     connections: RBXScriptConnection[]
 end
 
-impl Character
+impl Character as
     function new(player: Player): Character
         local self = new Character {
             player = player,
@@ -168,19 +168,19 @@ end
 -- Writing `function __call(self, amount)` directly in `impl Health` means
 -- the same thing. Neither one can intercept `Health { ... }` or `new`.
 
-impl Call for Health
+impl Call for Health as
     function call(self, amount: number)
         self:take_damage(amount)
     end
 end
 
-impl Display for Character
+impl Display for Character as
     function to_string(self): string
         return `{self.player.Name} ({self.health.current}/{self.health.max})`
     end
 end
 
-impl Eq for Character
+impl Eq for Character as
     function eq(self, other: Character): boolean
         return self.player == other.player
     end
@@ -188,7 +188,7 @@ end
 
 -- 5. Cleanup through Drop. `delete` calls the emitted Destroy.
 
-impl Drop for Character
+impl Drop for Character as
     function drop(self)
         for _, connection in self.connections do
             connection:Disconnect()

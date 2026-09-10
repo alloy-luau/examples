@@ -24,7 +24,7 @@ struct Menu as
     opens: number = 0
 end
 
-impl Menu
+impl Menu as
     function on_click(self)
         self.opens += 1
     end

@@ -48,7 +48,7 @@ struct Timer as
     connection: RBXScriptConnection?
 end
 
-impl Drop for Timer
+impl Drop for Timer as
     function drop(self)
         self.connection?:Disconnect()
     end

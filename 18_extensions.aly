@@ -3,12 +3,12 @@
 -- completed natively. At runtime a call by an extension name goes through
 -- a dispatcher that tries the real method first, then the impl by kind.
 
-trait Shape
+trait Shape as
     function area(self): number
 end
 
 -- A Roblox datatype. A foreign impl is project-wide, so it is exported.
-export impl Vector3
+export impl Vector3 as
     function flat(self): Vector3
         return Vector3.new(self.X, 0, self.Z)
     end
@@ -24,7 +24,7 @@ export impl Vector3
 end
 
 -- An Instance class. Subclasses inherit through the ClassName chain.
-export impl BasePart
+export impl BasePart as
     function fade(self, seconds: number)
         game:GetService("TweenService")
             :Create(self, TweenInfo.new(seconds), { Transparency = 1 })
@@ -33,14 +33,14 @@ export impl BasePart
 end
 
 -- A trait on a foreign type.
-export impl Shape for BasePart
+export impl Shape for BasePart as
     function area(self): number
         return self.Size.X * self.Size.Z
     end
 end
 
 -- A primitive.
-export impl string
+export impl string as
     function trim(self): string
         return self:match("^%s*(.-)%s*$") :: string
     end
@@ -51,7 +51,7 @@ struct Circle as
     radius: number
 end
 
-impl Shape for Circle
+impl Shape for Circle as
     function area(self): number
         return math.pi * self.radius ^ 2
     end
