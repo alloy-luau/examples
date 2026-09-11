@@ -58,7 +58,7 @@ local a = $clamp01(ratio)
 local b = $square(ratio)
 $dbg(ratio)
 
-type Handler = { on_done: ((number) -> ())?, target: BasePart? }
+type Handler = { on_done: ((number) -> number)?, target: BasePart? }
 local handler: Handler = { on_done = nil, target = nil }
 local part = handler.target! -- assert, no call
 local size = handler.target!.Size -- assert, then index
