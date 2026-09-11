@@ -102,6 +102,13 @@ if RunService:IsClient() then
         return true
     end)
 
+    -- `try await` returns the Err from the function it sits in, so it
+    -- wants one that gives back a Result.
+    local async function safe_profile(): Result<Profile, any>
+        local profile = try await GetProfile.call(4) -- Err on timeout or failure
+        return Ok(profile)
+    end
+
     -- `call` returns a Future. Await it, or combine it. This file is a
     -- module, so the awaits sit in an `async do` block; in a
     -- `*.client.aly` script they would stand at the top level.
@@ -109,7 +116,7 @@ if RunService:IsClient() then
         local profile = await GetProfile.call(1)
         print(profile)
         local both = await Future.all([ GetProfile.call(2), GetProfile.call(3) ])
-        local safe = try await GetProfile.call(4) -- Result on timeout or failure
+        local safe = await safe_profile()
 
         -- `wait` returns a Future of the next payload.
         local message, seconds = await Toast.wait()
