@@ -102,11 +102,20 @@ if RunService:IsClient() then
         return true
     end)
 
-    -- `call` returns a Future. Await it, or combine it.
-    local profile = await GetProfile.call(1)
-    print(profile)
-    local both = await Future.all([ GetProfile.call(2), GetProfile.call(3) ])
-    local safe = try await GetProfile.call(4) -- Result on timeout or failure
+    -- `call` returns a Future. Await it, or combine it. This file is a
+    -- module, so the awaits sit in an `async do` block; in a
+    -- `*.client.aly` script they would stand at the top level.
+    async do
+        local profile = await GetProfile.call(1)
+        print(profile)
+        local both = await Future.all([ GetProfile.call(2), GetProfile.call(3) ])
+        local safe = try await GetProfile.call(4) -- Result on timeout or failure
+
+        -- `wait` returns a Future of the next payload.
+        local message, seconds = await Toast.wait()
+        print(message, seconds, both, safe)
+    end
+
     local pending = GetProfile.call(5)
     pending:cancel()
     Damage.fire(Players.LocalPlayer, 10)
@@ -119,8 +128,6 @@ if RunService:IsClient() then
     end)
     Ping.fire(os.clock())
 
-    -- `wait` returns a Future of the next payload. `once` is the callback form.
+    -- `once` is the callback form of `wait`.
     Toast.once(function(message) print("first toast", message) end)
-    local message, seconds = await Toast.wait()
-    print(message, seconds, both, safe)
 end

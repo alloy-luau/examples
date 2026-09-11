@@ -55,10 +55,14 @@ seen:add(4)
 local both = seen:intersection(Set.from([ 3, 4, 5 ]))
 print(seen:has(2), both:len(), both:to_array())
 
--- Future is ambient too.
+-- Future is ambient too. This file is a module, so `await` goes inside
+-- an `async do` block: at a module's top level the yield lands in
+-- `require`. The block is an expression, and its value is a Future.
 local ready = Future.resolve(42)
 local timer = Future.delay(1)
-local first = await Future.race([ ready, timer ])
+local first = async do
+    return await Future.race([ ready, timer ])
+end
 
 -- `in` is membership, dispatched on the container at runtime.
 local test = [ 3, 1, 2, 4 ]

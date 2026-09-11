@@ -55,12 +55,13 @@ local function load_both(a: string, b: string): Result<number, string>
     return combined:map(function(v) return v / 2 end)
 end
 
--- `try await` turns a failed Future into an Err.
+-- `try await` turns a failed Future into an Err. It follows the same
+-- placement rule as `await`, so the function that writes it is `async`.
 local async function fetch(url: string): string
     return HttpService:GetAsync(url)
 end
 
-local function fetch_or_err(url: string): Result<string, string>
+local async function fetch_or_err(url: string): Result<string, string>
     local body = try await fetch(url)
     return Ok(body)
 end

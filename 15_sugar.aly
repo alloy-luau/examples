@@ -107,13 +107,17 @@ print(tier)
 local menu = new Menu { button = new Instance("TextButton") }
 print(menu.opens) -- 0
 
--- `async do` gives a Future from a block.
+-- `async do` gives a Future from a block, and stands alone as a
+-- statement when the Future is not wanted. `await` needs one of these:
+-- at a module's top level the yield would land in `require`.
 local loaded = async do
     local part = Workspace=>Map=>Spawn
     return part.Position
 end
 
-local spawn_position = await loaded
+local spawn_position = async do
+    return await loaded
+end
 
 -- The object initializer: an optional table after any `new X(...)`.
 -- Each field lands on its own line. `Parent` goes last.

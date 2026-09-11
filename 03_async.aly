@@ -23,23 +23,50 @@ const async function load_many(ids: { number }): { Profile }
     return await Future.all(futures)
 end
 
--- `await` is legal wherever a yield is legal, not only inside `async`.
-local function greet(user_id: number)
+-- `await` needs an async context. A plain function is not one, so this
+-- one is marked `async`; the other fix is `async do ... end` around the
+-- body. The context is per function: a `function` inside an `async
+-- function` is plain again.
+local async function greet(user_id: number)
     local profile = await load_profile(user_id)
     print(`Welcome back, {profile.name} (level {profile.level})`)
 end
 
+-- The rule is not style. `await` yields, and Luau cannot yield out of a
+-- callback it runs from C: on Roblox a `table.sort` comparator that
+-- awaits dies with "attempt to yield across metamethod/C-call
+-- boundary". Read what you need before the sort, where the yield is
+-- safe, and the comparator stays plain.
+local async function ranked(ids: { number }): { number }
+    local levels = {}
+    for _, id in ids do
+        levels[id] = (await load_profile(id)).level
+    end
+
+    local order = table.clone(ids)
+    table.sort(order, function(a, b)
+        -- `await load_profile(a)` here is the error the rule catches.
+        return levels[a] < levels[b]
+    end)
+    return order
+end
+
 -- Awaitable protocol: anything with the awaitable shape works, including
 -- an evaera Promise, with no wrapper.
-local function wait_for_promise(promise: any)
+local async function wait_for_promise(promise: any)
     return await promise
 end
 
 -- A settled Future resolves at once. A failed Future rethrows the stored
--- error with the traceback captured at the failure site.
+-- error with the traceback captured at the failure site. This file is a
+-- module, so its top level runs inside `require`: the reads go in an
+-- `async do` block, which starts a thread of its own.
 local first = load_profile(1)
-local again = await first
-local same = await first
+local twice = async do
+    local again = await first
+    local same = await first
+    print(again.name == same.name)
+end
 
 -- Cancellation stops work that has not started and rejects waiters.
 local slow = load_many({ 1, 2, 3 })
@@ -50,4 +77,9 @@ local ping = async function(): number
     return os.clock()
 end
 
-print(again.name == same.name, greet, wait_for_promise, await ping())
+-- `async do` stands alone as a statement too, and drops the Future.
+async do
+    print(await ping())
+end
+
+print(twice, greet, ranked, wait_for_promise)
