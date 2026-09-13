@@ -36,8 +36,8 @@ macro retry_count(n = 3)
     n
 end
 
--- A macro body sees globals, not module locals, since it expands in
--- the calling file.
+-- A macro body expands in the calling file, so it may name what every
+-- file has, the Luau globals, and not this module's locals.
 export macro assert_server()
     $assert(game:GetService("RunService"):IsServer())
 end
