@@ -46,7 +46,7 @@ end
 
 -- Reading at runtime. Results are typed from the declaration.
 local field_range = Attributes.field(Health, "current", range) -- { min: number, max: number }?
-local struct_icon = Attributes.get(Health, icon) -- { asset: string }?
+local struct_icon = Attributes.get(Health, icon) -- string?
 local red_icon = Attributes.variant(Team, "Red", icon)
 local on_save = Attributes.of(save) -- every attribute on save
 local guarded = Attributes.get(save, server_only) ~= nil
