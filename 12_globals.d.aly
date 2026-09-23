@@ -5,34 +5,34 @@
 declare function warn_once(message: string): ()
 
 declare extern type PluginToolbar with
-    function CreateButton(self, id: string, tooltip: string, icon: string): PluginToolbarButton
+  function CreateButton(self, id: string, tooltip: string, icon: string): PluginToolbarButton
 end
 
 declare plugin: Plugin
 
 -- Alloy type sugar works here too.
 interface Serializable as
-    read version: number
-    write debug_sink: (string) -> ()
+  read version: number
+  write debug_sink: (string) -> ()
 end
 
 interface SaveData extends Serializable as
-    coins: number
-    items: { string }
+  coins: number
+  items: { string }
 end
 
 trait Codec as
-    function encode(self): string
-    function decode(self, raw: string): SaveData
+  function encode(self): string
+  function decode(self, raw: string): SaveData
 end
 
 -- Type functions are allowed here, written by hand or generated.
 type function Keys(t)
-    local out: { type } = {}
-    for k in t:properties() do
-        table.insert(out, k)
-    end
-    return types.unionof(table.unpack(out))
+  local out: { type } = {}
+  for k in t:properties() do
+    table.insert(out, k)
+  end
+  return types.unionof(table.unpack(out))
 end
 
 export type Patch<T> = { [K in keyof T]: T[K]? }

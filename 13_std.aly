@@ -18,8 +18,8 @@ local c: { number } = b -- an Array<T> is accepted as a { T }
 local doubled = xs:map(function(x) return x * 2 end)
 local same = Array.map(xs, function(x: number) return x * 2 end)
 local total = xs:filter(function(x) return x % 2 == 1 end):reduce(
-    function(acc: number, x) return acc + x end,
-    0
+  function(acc: number, x) return acc + x end,
+  0
 )
 xs:push(4)
 local last = xs:pop()
@@ -30,7 +30,7 @@ print(#xs, xs:len(), xs:contains(2), last, same)
 local children = Array.from(workspace:GetChildren())
 local names = children:map(function(inst) return inst.Name end)
 local raw_names = Array.map(workspace:GetChildren(), function(inst) return inst.Name end)
-print(names:join(", "), raw_names:join(", "))
+print(names:join(', '), raw_names:join(', '))
 
 -- Construction with explicit type arguments uses upstream's <<T>> form.
 local ids = new Array<<number>>()
@@ -39,15 +39,15 @@ Array.push(ids, 1)
 
 -- HashMap and Set are Alloy structs, so they carry methods.
 local scores = new HashMap<<string, number>>()
-scores:set("ana", 10)
-scores:set("bo", 7)
+scores:set('ana', 10)
+scores:set('bo', 7)
 
-local ana = scores:get("ana") ?? 0
+local ana = scores:get('ana') ?? 0
 for name, score in scores:entries() do
-    print(name, score)
+  print(name, score)
 end
 
-local hits = scores:get_or_insert("cy", 0)
+local hits = scores:get_or_insert('cy', 0)
 
 local seen = Set.from([ 1, 2, 3 ])
 seen:add(4)
@@ -61,20 +61,20 @@ print(seen:has(2), both:len(), both:to_array())
 local ready = Future.resolve(42)
 local timer = Future.delay(1)
 local first = async do
-    return await Future.race([ ready, timer ])
+  return await Future.race([ ready, timer ])
 end
 
 -- `in` is membership, dispatched on the container at runtime.
 local test = [ 3, 1, 2, 4 ]
 if 3 in test then
-    print("found")
+  print('found')
 end
 
-print(2 in seen, "ana" in scores, "bc" in "abc", not (9 in test))
+print(2 in seen, 'ana' in scores, 'bc' in 'abc', not (9 in test))
 
 -- Symbol makes a unique key that no string can collide with.
-local CHILDREN = Symbol.new("Children")
-local props = { [CHILDREN] = [], Name = "x" }
+local CHILDREN = Symbol.new('Children')
+local props = { [CHILDREN] = [], Name = 'x' }
 print(tostring(CHILDREN), props[CHILDREN])
 
 -- Result is ambient, with Ok and Err.
@@ -83,8 +83,8 @@ local value = parsed:map(function(n) return n + 1 end):unwrap_or(0)
 local maybe: number? = parsed:ok()
 
 -- Queue and Heap: a work list and a priority list.
-local jobs = Queue.from([ "load", "spawn", "greet" ])
-jobs:push("save")
+local jobs = Queue.from([ 'load', 'spawn', 'greet' ])
+jobs:push('save')
 local next_job = jobs:pop()
 
 local open = Heap.new(function(a: { cost: number }, b: { cost: number }) return a.cost < b.cost end)
@@ -94,13 +94,13 @@ local nearest = open:pop()
 
 -- Scope: a cleanup bag that `delete` drains, newest first.
 local scope = Scope.new()
-local heartbeat = scope:add(game:GetService("RunService").Heartbeat:Connect(function() end))
-scope:add(function() print("scope closed") end)
+local heartbeat = scope:add(game:GetService('RunService').Heartbeat:Connect(function() end))
+scope:add(function() print('scope closed') end)
 delete scope
 
 -- Iter: a lazy chain; nothing runs until `collect` pulls.
 local big_evens = Iter.range(1, 100):filter(function(n) return n % 2 == 0 end):map(
-    function(n) return n * n end
+  function(n) return n * n end
 ):take(3):collect()
 
 print(doubled, total, ana, hits, first, value, maybe, buffer, grid, c)

@@ -4,25 +4,25 @@
 
 -- An expression macro: the last statement is a bare expression.
 macro clamp01(x)
-    math.clamp(x, 0, 1)
+  math.clamp(x, 0, 1)
 end
 
 -- A statement macro. `$stringify` and `$dbg` are intrinsics and may be
 -- used inside a macro body.
 macro log(expr)
-    print(`[{script.Name}] {$stringify(expr)} = {expr}`)
+  print(`[{script.Name}] {$stringify(expr)} = {expr}`)
 end
 
 -- A parameter used twice expands twice. Bind a local to evaluate once.
 -- The local is renamed on expansion and never captures a caller's name.
 macro square(x)
-    local value = x
-    value * value
+  local value = x
+  value * value
 end
 
 -- Macros may call macros.
 macro log_squared(x)
-    $log($square(x))
+  $log($square(x))
 end
 
 -- A macro cannot capture a module local. This declaration is an error:
@@ -33,13 +33,13 @@ end
 
 -- A default parameter follows the function rule.
 macro retry_count(n = 3)
-    n
+  n
 end
 
 -- A macro body expands in the calling file, so it may name what every
 -- file has, the Luau globals, and not this module's locals.
 export macro assert_server()
-    $assert(game:GetService("RunService"):IsServer())
+  $assert(game:GetService('RunService'):IsServer())
 end
 
 -- Usage.

@@ -4,57 +4,57 @@
 -- a dispatcher that tries the real method first, then the impl by kind.
 
 trait Shape as
-    function area(self): number
+  function area(self): number
 end
 
 -- A Roblox datatype. A foreign impl is project-wide, so it is exported.
 export impl Vector3 as
-    function flat(self): Vector3
-        return Vector3.new(self.X, 0, self.Z)
-    end
+  function flat(self): Vector3
+    return Vector3.new(self.X, 0, self.Z)
+  end
 
-    function with_y(self, y: number): Vector3
-        return Vector3.new(self.X, y, self.Z)
-    end
+  function with_y(self, y: number): Vector3
+    return Vector3.new(self.X, y, self.Z)
+  end
 
-    -- No self: a static, called as Vector3.origin(). `-> T` is `: T`.
-    function origin() -> Vector3
-        return Vector3.new(0, 0, 0)
-    end
+  -- No self: a static, called as Vector3.origin(). `-> T` is `: T`.
+  function origin() -> Vector3
+    return Vector3.new(0, 0, 0)
+  end
 end
 
 -- An Instance class. Subclasses inherit through the ClassName chain.
 export impl BasePart as
-    function fade(self, seconds: number)
-        game:GetService("TweenService")
-            :Create(self, TweenInfo.new(seconds), { Transparency = 1 })
-            :Play()
-    end
+  function fade(self, seconds: number): ()
+    game:GetService('TweenService')
+      :Create(self, TweenInfo.new(seconds), { Transparency = 1 })
+      :Play()
+  end
 end
 
 -- A trait on a foreign type.
 export impl Shape for BasePart as
-    function area(self): number
-        return self.Size.X * self.Size.Z
-    end
+  function area(self): number
+    return self.Size.X * self.Size.Z
+  end
 end
 
 -- A primitive.
 export impl string as
-    function trim(self): string
-        return self:match("^%s*(.-)%s*$") :: string
-    end
+  function trim(self): string
+    return self:match('^%s*(.-)%s*$') :: string
+  end
 end
 
 -- An Alloy struct. No rewrite is needed here; `:` is a plain call.
 struct Circle as
-    radius: number
+  radius: number
 end
 
 impl Shape for Circle as
-    function area(self): number
-        return math.pi * self.radius ^ 2
-    end
+  function area(self): number
+    return math.pi * self.radius ^ 2
+  end
 end
 
 -- Usage. The analyzer sees the injected declarations, so these are
@@ -63,16 +63,16 @@ local position = Vector3.new(1, 2, 3)
 local flat = position:flat():with_y(5)
 local origin = Vector3.origin()
 
-local part = new Instance("Part") { Anchored = true, Parent = workspace }
+local part = new Instance('Part') { Anchored = true, Parent = workspace }
 part:fade(1)
 
-local clean = "  hello  ":trim()
+local clean = '  hello  ':trim()
 
 -- A bounded generic works for structs and foreign types alike. The bound
 -- reaches a bare `T` parameter only: under an array it would make the
 -- type invariant, so the checker cannot see `area` through `T[]`.
 local function total_area<T: Shape>(shapes: T[]) -> number
-    return shapes:reduce(function(acc: number, shape) return acc + shape:area() end, 0) --@alloy-ignore
+  return shapes:reduce(function(acc: number, shape) return acc + shape:area() end, 0) --@alloy-ignore
 end
 
 print(flat, origin, clean, total_area([ new Circle { radius = 1 } ]), total_area([ part ]))

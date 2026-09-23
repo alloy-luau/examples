@@ -3,29 +3,29 @@
 -- word for saying so out loud. Both words are reserved.
 
 struct Counter as
-    public read name: string
-    private count: number = 0
-    private history: number[] = []
+  public read name: string
+  private count: number = 0
+  private history: number[] = []
 end
 
 impl Counter as
-    function bump(self): number
-        self.count += 1
-        self:record()
-        return self.count
-    end
+  function bump(self): number
+    self.count += 1
+    self:record()
+    return self.count
+  end
 
-    public function peek(self): number
-        return self.count
-    end
+  public function peek(self): number
+    return self.count
+  end
 
-    -- Only `bump` and `peek` reach this.
-    private function record(self)
-        self.history:push(self.count)
-    end
+  -- Only `bump` and `peek` reach this.
+  private function record(self)
+    self.history:push(self.count)
+  end
 end
 
-local hits = new Counter { name = "hits" }
+local hits = new Counter { name = 'hits' }
 hits:bump()
 hits:bump()
 -- `hits.count` and `hits:record()` here would be type errors: the public

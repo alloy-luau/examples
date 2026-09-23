@@ -2,6 +2,6 @@
 -- named exports in the same file.
 
 export default {
-    primary = Color3.fromRGB(230, 16, 72),
-    text = Color3.fromRGB(240, 240, 240),
+  primary = Color3.fromRGB(230, 16, 72),
+  text = Color3.fromRGB(240, 240, 240),
 }

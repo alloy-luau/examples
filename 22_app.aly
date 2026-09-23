@@ -1,16 +1,16 @@
 -- An .aly file imports an .alx component, and the .alx imports .aly
 -- types: both compile to .luau, so a require between them resolves.
 
-import InventoryPanel from "./11_ui"
-import type { Item } from "./02_modules/inventory"
+import InventoryPanel from './11_ui'
+import type { Item } from './02_modules/inventory'
 -- The package is not checked out beside the examples; the directive
 -- keeps the checker quiet about the missing module.
-import * as React from "@packages/react" --@alloy-ignore
+import * as React from '@packages/react' --@alloy-ignore
 
-local items: Item[] = [ { id = 1, name = "Sword", count = 1 } :: Item ]
+local items: Item[] = [ { id = 1, name = 'Sword', count = 1 } :: Item ]
 
 local function App()
-    return React.createElement(InventoryPanel, { items = items, title = "Bag" })
+  return React.createElement(InventoryPanel, { items = items, title = 'Bag' })
 end
 
 return App

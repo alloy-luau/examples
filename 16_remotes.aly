@@ -7,8 +7,11 @@
 -- `*.client.aly` files, which is what makes each side's surface a type.
 -- This file uses `RunService` branches to show both in one place.
 
+-- A client asks the server to damage a player.
 export remote Damage(target: Player, @u16 amount: number) from client
+-- The server shows a message on a client.
 export remote Toast(message: string, seconds: number = 3) from server
+-- A client asks the server for a profile.
 export remote function GetProfile(id: number) -> Profile from client
 
 -- Unreliable: the compiler errors when the packed size can pass 900 bytes.
@@ -41,100 +44,101 @@ export remote Fire(origin: Vector3, direction: Vector3) from client
 -- Structs and enums serialize by their declarations.
 @derive(Debug)
 struct Profile as
-    read id: number
-    name: string
-    level: number
-    tags: string[]
+  read id: number
+  name: string
+  level: number
+  tags: string[]
 end
 
 enum Team as
-    Red
-    Blue
+  Red
+  Blue
 end
 
+-- A client asks to join a team.
 export remote JoinTeam(team: Team) from client
 
 -- 2. Server. The handler always receives the sender first.
 
-local RunService = game:GetService("RunService")
-local Players = game:GetService("Players")
+local RunService = game:GetService('RunService')
+local Players = game:GetService('Players')
 
 if RunService:IsServer() then
-    Damage.on(function(sender: Player, target: Player, amount: number)
-        print(`{sender.Name} hit {target.Name} for {amount}`)
-    end)
+  Damage.on(function(sender: Player, target: Player, amount: number)
+    print(`{sender.Name} hit {target.Name} for {amount}`)
+  end)
 
-    Chat.on(function(sender: Player, text: string)
-        Toast.fire_except(sender, `{sender.Name}: {text}`, 4)
-    end)
+  Chat.on(function(sender: Player, text: string)
+    Toast.fire_except(sender, `{sender.Name}: {text}`, 4)
+  end)
 
-    Chat.on_ratelimited(function(sender: Player)
-        warn(`{sender.Name} is chatting too fast`)
-    end)
+  Chat.on_ratelimited(function(sender: Player)
+    warn(`{sender.Name} is chatting too fast`)
+  end)
 
-    -- An async handler: the runtime awaits the Future before it replies.
-    GetProfile.on(async function(sender: Player, id: number): Profile
-        local store = game:GetService("DataStoreService"):GetDataStore("profiles")
-        local raw = store:GetAsync(`profile/{id}`)
-        return new Profile { id = id, name = sender.Name, level = raw?.level ?? 1, tags = [] }
-    end)
+  -- An async handler: the runtime awaits the Future before it replies.
+  GetProfile.on(async function(sender: Player, id: number): Profile
+    local store = game:GetService('DataStoreService'):GetDataStore('profiles')
+    local raw = store:GetAsync(`profile/{id}`)
+    return new Profile { id = id, name = sender.Name, level = raw?.level ?? 1, tags = [] }
+  end)
 
-    JoinTeam.on(function(sender: Player, team: Team)
-        print(sender.Name, team)
-    end)
+  JoinTeam.on(function(sender: Player, team: Team)
+    print(sender.Name, team)
+  end)
 
-    Ping.on(function(sender: Player, sent_at: number)
-        Ping.fire(sender, sent_at) -- reply to that client only
-    end)
+  Ping.on(function(sender: Player, sent_at: number)
+    Ping.fire(sender, sent_at) -- reply to that client only
+  end)
 
-    Toast.fire_all("Server started")
+  Toast.fire_all('Server started')
 end
 
 -- 3. Client. The surface exposes only what the direction allows.
 -- `Damage.on` does not exist here; that is a type error.
 
 if RunService:IsClient() then
-    Toast.on(function(message: string, seconds: number)
-        print(message, seconds)
-    end)
+  Toast.on(function(message: string, seconds: number)
+    print(message, seconds)
+  end)
 
-    Confirm.on(function(prompt: string): boolean
-        return true
-    end)
+  Confirm.on(function(prompt: string): boolean
+    return true
+  end)
 
-    -- `try await` returns the Err from the function it sits in, so it
-    -- wants one that gives back a Result.
-    local async function safe_profile(): Result<Profile, any>
-        local profile = try await GetProfile.call(4) -- Err on timeout or failure
-        return Ok(profile)
-    end
+  -- `try await` returns the Err from the function it sits in, so it
+  -- wants one that gives back a Result.
+  local async function safe_profile(): Result<Profile, any>
+    local profile = try await GetProfile.call(4) -- Err on timeout or failure
+    return Ok(profile)
+  end
 
-    -- `call` returns a Future. Await it, or combine it. This file is a
-    -- module, so the awaits sit in an `async do` block; in a
-    -- `*.client.aly` script they would stand at the top level.
-    async do
-        local profile = await GetProfile.call(1)
-        print(profile)
-        local both = await Future.all([ GetProfile.call(2), GetProfile.call(3) ])
-        local safe = await safe_profile()
+  -- `call` returns a Future. Await it, or combine it. This file is a
+  -- module, so the awaits sit in an `async do` block; in a
+  -- `*.client.aly` script they would stand at the top level.
+  async do
+    local profile = await GetProfile.call(1)
+    print(profile)
+    local both = await Future.all([ GetProfile.call(2), GetProfile.call(3) ])
+    local safe = await safe_profile()
 
-        -- `wait` returns a Future of the next payload.
-        local message, seconds = await Toast.wait()
-        print(message, seconds, both, safe)
-    end
+    -- `wait` returns a Future of the next payload.
+    local message, seconds = await Toast.wait()
+    print(message, seconds, both, safe)
+  end
 
-    local pending = GetProfile.call(5)
-    pending:cancel()
-    Damage.fire(Players.LocalPlayer, 10)
-    JoinTeam.fire(Team.Red)
-    Position.fire(CFrame.new())
-    Heal.fire(50)
+  local pending = GetProfile.call(5)
+  pending:cancel()
+  Damage.fire(Players.LocalPlayer, 10)
+  JoinTeam.fire(Team.Red)
+  Position.fire(CFrame.new())
+  Heal.fire(50)
 
-    Ping.on(function(sent_at: number)
-        print("round trip", os.clock() - sent_at)
-    end)
-    Ping.fire(os.clock())
+  Ping.on(function(sent_at: number)
+    print('round trip', os.clock() - sent_at)
+  end)
+  Ping.fire(os.clock())
 
-    -- `once` is the callback form of `wait`.
-    Toast.once(function(message) print("first toast", message) end)
+  -- `once` is the callback form of `wait`.
+  Toast.once(function(message) print('first toast', message) end)
 end

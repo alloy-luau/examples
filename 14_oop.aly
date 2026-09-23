@@ -5,7 +5,7 @@
 -- share behavior. There is no inheritance: compose structs, share behavior
 -- through traits.
 
-local Players = game:GetService("Players")
+local Players = game:GetService('Players')
 
 -- 1. A plain class: struct + impl. No trait needed.
 -- `@derive(Debug)` writes `debug(self)` and, since Health has no Display
@@ -13,154 +13,154 @@ local Players = game:GetService("Players")
 
 @derive(Debug)
 struct Health as
-    read max: number
-    current: number
-    on_death: (() -> ())?
+  read max: number
+  current: number
+  on_death: (() -> ())?
 end
 
 impl Health as
-    -- `new` is a normal function on the class table. `new Health(100)`
-    -- calls it. `Health { ... }` is the raw constructor: the class table's
-    -- own metatable has `__call`, which sets the instance metatable. A
-    -- lint warns on the raw form outside this impl block.
-    function new(max: number): Health
-        return new Health { max = max, current = max, on_death = nil }
-    end
+  -- `new` is a normal function on the class table. `new Health(100)`
+  -- calls it. `Health { ... }` is the raw constructor: the class table's
+  -- own metatable has `__call`, which sets the instance metatable. A
+  -- lint warns on the raw form outside this impl block.
+  function new(max: number): Health
+    return new Health { max = max, current = max, on_death = nil }
+  end
 
-    function take_damage(self, amount: number)
-        self.current = math.max(self.current - amount, 0)
-        if self.current == 0 then
-            self.on_death?()
-        end
+  function take_damage(self, amount: number): ()
+    self.current = math.max(self.current - amount, 0)
+    if self.current == 0 then
+      self.on_death?()
     end
+  end
 
-    function heal(self, amount: number)
-        self.current = math.min(self.current + amount, self.max)
-    end
+  function heal(self, amount: number): ()
+    self.current = math.min(self.current + amount, self.max)
+  end
 
-    function is_alive(self): boolean
-        return self.current > 0
-    end
+  function is_alive(self): boolean
+    return self.current > 0
+  end
 
-    -- A function without `self` is a static function.
-    function full(max: number): Health
-        return Health.new(max)
-    end
+  -- A function without `self` is a static function.
+  function full(max: number): Health
+    return Health.new(max)
+  end
 end
 
 -- 2. Shared behavior: a trait, and two structs that implement it.
 
 trait Weapon as
-    function damage(self): number
-    function fire(self, target: Health)
-    -- A body makes a default. Each implementing struct gets a copy.
-    function describe(self): string
-        return `weapon dealing {self:damage()}`
-    end
+  function damage(self): number
+  function fire(self, target: Health): ()
+  -- A body makes a default. Each implementing struct gets a copy.
+  function describe(self): string
+    return `weapon dealing {self:damage()}`
+  end
 end
 
 struct Sword as
-    read edge: number
-    durability: number
+  read edge: number
+  durability: number
 end
 
 impl Sword as
-    function new(edge: number): Sword
-        return new Sword { edge = edge, durability = 100 }
-    end
+  function new(edge: number): Sword
+    return new Sword { edge = edge, durability = 100 }
+  end
 end
 
 impl Weapon for Sword as
-    function damage(self): number
-        return self.edge * (self.durability / 100)
-    end
+  function damage(self): number
+    return self.edge * (self.durability / 100)
+  end
 
-    function fire(self, target: Health)
-        target:take_damage(self:damage())
-        self.durability -= 1
-    end
+  function fire(self, target: Health)
+    target:take_damage(self:damage())
+    self.durability -= 1
+  end
 end
 
 struct Bow as
-    read draw: number
-    arrows: number
+  read draw: number
+  arrows: number
 end
 
 impl Bow as
-    function new(draw: number, arrows: number) -> Bow
-        return new Bow { draw = draw, arrows = arrows }
-    end
+  function new(draw: number, arrows: number) -> Bow
+    return new Bow { draw = draw, arrows = arrows }
+  end
 end
 
 impl Weapon for Bow as
-    function damage(self): number
-        return self.draw * 2
-    end
+  function damage(self): number
+    return self.draw * 2
+  end
 
-    function fire(self, target: Health)
-        if self.arrows == 0 then
-            return
-        end
-        self.arrows -= 1
-        target:take_damage(self:damage())
+  function fire(self, target: Health)
+    if self.arrows == 0 then
+      return
     end
+    self.arrows -= 1
+    target:take_damage(self:damage())
+  end
 
-    -- An impl may replace a default.
-    function describe(self): string
-        return `bow with {self.arrows} arrows`
-    end
+  -- An impl may replace a default.
+  function describe(self): string
+    return `bow with {self.arrows} arrows`
+  end
 end
 
 -- Code written against the trait accepts any implementor. The bound is
 -- structural: a hand-written Luau table with the same methods also fits.
 local function volley(weapons: Weapon[], target: Health)
-    for _, weapon in weapons do
-        weapon:fire(target)
-        print(weapon:describe())
-    end
+  for _, weapon in weapons do
+    weapon:fire(target)
+    print(weapon:describe())
+  end
 end
 
 local function strongest<T: Weapon>(a: T, b: T): T
-    return if a:damage() >= b:damage() then a else b
+  return if a:damage() >= b:damage() then a else b
 end
 
 -- 3. Composition instead of inheritance.
 
 struct Character as
-    read player: Player
-    health: Health
-    weapon: Weapon?
-    connections: RBXScriptConnection[]
+  read player: Player
+  health: Health
+  weapon: Weapon?
+  connections: RBXScriptConnection[]
 end
 
 impl Character as
-    function new(player: Player): Character
-        local self = new Character {
-            player = player,
-            health = Health.new(100),
-            weapon = nil,
-            connections = [],
-        }
-        self.health.on_death = function()
-            self:on_death()
-        end
-        self.connections:push(player.CharacterAdded:Connect(function()
-            self.health:heal(self.health.max)
-        end))
-        return self
+  function new(player: Player): Character
+    local self = new Character {
+      player = player,
+      health = Health.new(100),
+      weapon = nil,
+      connections = [],
+    }
+    self.health.on_death = function()
+      self:on_death()
     end
+    self.connections:push(player.CharacterAdded:Connect(function()
+      self.health:heal(self.health.max)
+    end))
+    return self
+  end
 
-    function equip(self, weapon: Weapon)
-        self.weapon = weapon
-    end
+  function equip(self, weapon: Weapon): ()
+    self.weapon = weapon
+  end
 
-    function attack(self, other: Character)
-        self.weapon?:fire(other.health)
-    end
+  function attack(self, other: Character): ()
+    self.weapon?:fire(other.health)
+  end
 
-    function on_death(self)
-        print(`{self.player.Name} died`)
-    end
+  function on_death(self): ()
+    print(`{self.player.Name} died`)
+  end
 end
 
 -- 4. Operator and display traits map to metamethods. `Call` lands on the
@@ -169,32 +169,32 @@ end
 -- the same thing. Neither one can intercept `Health { ... }` or `new`.
 
 impl Call for Health as
-    function call(self, amount: number)
-        self:take_damage(amount)
-    end
+  function call(self, amount: number)
+    self:take_damage(amount)
+  end
 end
 
 impl Display for Character as
-    function to_string(self): string
-        return `{self.player.Name} ({self.health.current}/{self.health.max})`
-    end
+  function to_string(self): string
+    return `{self.player.Name} ({self.health.current}/{self.health.max})`
+  end
 end
 
 impl Eq for Character as
-    function eq(self, other: Character): boolean
-        return self.player == other.player
-    end
+  function eq(self, other: Character): boolean
+    return self.player == other.player
+  end
 end
 
 -- 5. Cleanup through Drop. `delete` calls the emitted Destroy.
 
 impl Drop for Character as
-    function drop(self)
-        for _, connection in self.connections do
-            connection:Disconnect()
-        end
-        self.connections = []
+  function drop(self)
+    for _, connection in self.connections do
+      connection:Disconnect()
     end
+    self.connections = []
+  end
 end
 
 -- Usage.

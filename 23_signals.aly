@@ -1,19 +1,19 @@
 -- Signals. `Signal` is ambient std. It has the shape of RBXScriptSignal,
 -- so code that takes either works with both.
 
-local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
+local Players = game:GetService('Players')
+local RunService = game:GetService('RunService')
 
 -- A signal carries typed payloads. The annotation names them; a handler
 -- gets them typed.
 local damaged = Signal.new<<(Player, number)>>()
 
 local conn = damaged:Connect(function(player, amount)
-    print(player.Name, "took", amount)
+  print(player.Name, 'took', amount)
 end)
 
 damaged:Once(function(player)
-    print("first hit on", player.Name)
+  print('first hit on', player.Name)
 end)
 
 -- Fire runs every handler in connection order, each on its own thread.
@@ -27,26 +27,26 @@ local joined = Signal.collect(Players.PlayerAdded)
 local hits = Signal.collect(damaged)
 
 RunService.Heartbeat:Connect(function()
-    for player in joined do
-        print("joined", player.Name)
-    end
+  for player in joined do
+    print('joined', player.Name)
+  end
 
-    for player, amount in hits do
-        print("hit", player.Name, amount)
-    end
+  for player, amount in hits do
+    print('hit', player.Name, amount)
+  end
 end)
 
 -- `wrap` gives a Signal that fires with a Roblox signal. `Destroy`
 -- disconnects from it.
 local leaving = Signal.wrap(Players.PlayerRemoving)
 leaving:Connect(function(player)
-    print("left", player.Name)
+  print('left', player.Name)
 end)
 
 -- `Wait` yields until the next fire, with an optional timeout in seconds.
 -- The parentheses keep the first of the two values it yields.
 async function first_hit(): Player
-    return (damaged:Wait(5))
+  return (damaged:Wait(5))
 end
 
 print(first_hit)

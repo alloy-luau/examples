@@ -1,11 +1,12 @@
 -- User-defined attributes: declared metadata with checked placement and
 -- typed arguments. Nothing is transformed. Consumers read the metadata.
 
-local DataStoreService = game:GetService("DataStoreService")
+local DataStoreService = game:GetService('DataStoreService')
 
 -- Declarations name the arguments and the targets. `export` makes one
 -- usable from other files, both to apply and to read.
 export attribute range(min: number, max: number) on field
+-- Marks a function that runs on the server only.
 export attribute server_only on function
 attribute icon(asset: string) on struct, enum, variant
 -- `@rename` and `@skip` are built in: `@derive(Serialize)` reads them.
@@ -16,38 +17,38 @@ attribute icon(asset: string) on struct, enum, variant
 --   local function load() end
 --   local r = Attributes.field(Health, "current", range)
 
-@icon("rbxassetid:/100")
+@icon('rbxassetid:/100')
 @derive(Serialize)
 struct Health as
-    @range(0, 100)
-    current: number
+  @range(0, 100)
+  current: number
 
-    max: number
+  max: number
 
-    -- Serialize honors rename and skip.
-    @rename("regen_per_second")
-    regen: number
+  -- Serialize honors rename and skip.
+  @rename('regen_per_second')
+  regen: number
 
-    @skip
-    last_hit: number?
+  @skip
+  last_hit: number?
 end
 
-@icon("rbxassetid:/200")
+@icon('rbxassetid:/200')
 enum Team as
-    @icon("rbxassetid:/201")
-    Red
-    Blue
+  @icon('rbxassetid:/201')
+  Red
+  Blue
 end
 
 @server_only
 local function save(player: Player, health: Health)
-    DataStoreService:GetDataStore("health"):SetAsync(tostring(player.UserId), health:to_table())
+  DataStoreService:GetDataStore('health'):SetAsync(tostring(player.UserId), health:to_table())
 end
 
 -- Reading at runtime. Results are typed from the declaration.
-local field_range = Attributes.field(Health, "current", range) -- { min: number, max: number }?
+local field_range = Attributes.field(Health, 'current', range) -- { min: number, max: number }?
 local struct_icon = Attributes.get(Health, icon) -- string?
-local red_icon = Attributes.variant(Team, "Red", icon)
+local red_icon = Attributes.variant(Team, 'Red', icon)
 local on_save = Attributes.of(save) -- every attribute on save
 local guarded = Attributes.get(save, server_only) ~= nil
 
@@ -60,14 +61,14 @@ local guarded = Attributes.get(save, server_only) ~= nil
 -- current: number
 
 -- A generic validator reads the metadata instead of hard-coding rules.
-local function validate<T>(value: T, struct_type: any) -> Result<T, string>
-    for name, r in Attributes.fields(struct_type, range) do
-        local v = (value :: any)[name]
-        if v < r.min or v > r.max then
-            return Err(`{name} must be in [{r.min}, {r.max}]`)
-        end
+local function validate<T>(value: T, struct_type: any) -> Result<T, string> --@alloy-ignore any struct
+  for name, r in Attributes.fields(struct_type, range) do
+    local v = (value :: any)[name] --@alloy-ignore a field by name
+    if v < r.min or v > r.max then
+      return Err(`{name} must be in [{r.min}, {r.max}]`)
     end
-    return Ok(value)
+  end
+  return Ok(value)
 end
 
 print(field_range, struct_icon, red_icon, on_save, guarded, validate)
