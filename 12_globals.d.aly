@@ -1,5 +1,6 @@
--- A declaration file. No runtime. Alloy compiles it to .d.luau in memory
--- and layers it into the analyzer's definitions.
+-- A declaration file: globals that every file sees with no import. It
+-- holds no runtime, and `alloy build` writes nothing for it. The editor
+-- and `alloy flux` load it as definitions.
 
 -- Luau's definition syntax works as is.
 declare function warn_once(message: string): ()
@@ -10,7 +11,8 @@ end
 
 declare plugin: Plugin
 
--- Alloy type sugar works here too.
+-- Alloy type sugar works here too. Every type is global, with or
+-- without `export`.
 interface Serializable as
   read version: number
   write debug_sink: (string) -> ()
@@ -24,6 +26,13 @@ end
 trait Codec as
   function encode(self): string
   function decode(self, raw: string): SaveData
+end
+
+-- An enum is a type alone here. The host gives the values, and a
+-- file writes one as its string: `local q: Quality = "High"`.
+enum Quality as
+  Low,
+  High,
 end
 
 -- Type functions are allowed here, written by hand or generated.
