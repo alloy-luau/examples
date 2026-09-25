@@ -40,7 +40,7 @@ type Sink<T> = { [K in keyof T]: write T[K] }
 
 -- Plain type functions stay available.
 type function Keys(t)
-  local out: { any } = {}
+  const out: { any } = {}
   for k in t:properties() do
     table.insert(out, k)
   end
@@ -55,8 +55,8 @@ local function patch(entity: Entity, changes: Partial<Entity>): Entity
   }
 end
 
-local frozen: Readonly<Entity> = table.freeze({ id = 1, name = 'a', position = Vector3.zero })
-local keys: Keys<Named> = 'name'
+const frozen: Readonly<Entity> = table.freeze({ id = 1, name = 'a', position = Vector3.zero })
+const keys: Keys<Named> = 'name'
 
 local sink: Sink<{ line: string }> = { line = '' }
 sink.line = 'written'
@@ -73,5 +73,5 @@ local function first_set<T: ~nil>(a: T, b: T): T
 end
 
 type NotText = ~string
-local count: NotText = 3
+const count: NotText = 3
 print(label(1), first_set(1, 2), count)

@@ -37,7 +37,7 @@ end
 
 -- Type functions are allowed here, written by hand or generated.
 type function Keys(t)
-  local out: { type } = {}
+  const out: { type } = {}
   for k in t:properties() do
     table.insert(out, k)
   end

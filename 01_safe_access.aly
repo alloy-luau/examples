@@ -1,7 +1,7 @@
 -- Safe access operators.
 -- Every operator here emits fixed Luau. Emit never looks at a type.
 
-local Players = game:GetService('Players')
+const Players = game:GetService('Players')
 
 -- `??` tests nil only. `or` would replace `false`.
 local function volume(settings: { volume: number? }?): number
@@ -9,7 +9,7 @@ local function volume(settings: { volume: number? }?): number
 end
 
 -- `??=` assigns when the left side is nil. The index runs once.
-local cache: { [string]: number } = {}
+const cache: { [string]: number } = {}
 local function get_or_seed(key: string): number
   cache[key] ??= math.random()
   return cache[key]
@@ -34,12 +34,12 @@ end
 
 -- `->` is FindFirstChild. Use it for a child that only exists at runtime.
 -- emits: local map = workspace:FindFirstChild("Map")
-local map = workspace->Map
-local spawn = workspace->Map->Spawns->Spawn1
+const map = workspace->Map
+const spawn = workspace->Map->Spawns->Spawn1
 
 -- A name with spaces is a string literal. A dynamic name goes in brackets.
-local points = workspace->'Spawn Points'
-local slot = workspace->`Slot{1}`
+const points = workspace->'Spawn Points'
+const slot = workspace->`Slot{1}`
 local function child_named(name: string): Instance?
   return workspace->[ name ]
 end
@@ -77,7 +77,7 @@ end
 
 -- What `!` and `?` do not do: a security-locked property or a throwing
 -- `__index` still throws. `?` is not `pcall`.
-local first = Players:GetPlayers()[1]
+const first = Players:GetPlayers()[1]
 print(head_position(first), humanoid_of(first?.Character), map, spawn)
 print(
   volume(nil),

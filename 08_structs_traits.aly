@@ -101,14 +101,14 @@ struct Save
 end
 
 -- `Clone` is deep: a nested struct and an array come back as copies.
-local save = Save.default()
+const save = Save.default()
 local copy = save:clone()
 copy.loadout.level = 5
 copy.badges:push('first win')
 print(save.loadout.level, #save.badges) -- 0 0
 
-local v = new Vec2(1, 2) + new Vec2(3, 4)
-local shapes: { Shape } = { new Circle { radius = 1 }, new Rect { w = 2, h = 3 } }
+const v = new Vec2(1, 2) + new Vec2(3, 4)
+const shapes: { Shape } = { new Circle { radius = 1 }, new Rect { w = 2, h = 3 } }
 
 print(v:len(), tostring(v), v == Vec2.new(4, 6))
 print(shapes[1]:describe(), shapes[2]:describe())

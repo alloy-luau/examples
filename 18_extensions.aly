@@ -59,14 +59,14 @@ end
 
 -- Usage. The analyzer sees the injected declarations, so these are
 -- ordinary typed calls.
-local position = Vector3.new(1, 2, 3)
-local flat = position:flat():with_y(5)
-local origin = Vector3.origin()
+const position = Vector3.new(1, 2, 3)
+const flat = position:flat():with_y(5)
+const origin = Vector3.origin()
 
-local part = new Instance('Part') { Anchored = true, Parent = workspace }
+const part = new Instance('Part') { Anchored = true, Parent = workspace }
 part:fade(1)
 
-local clean = '  hello  ':trim()
+const clean = '  hello  ':trim()
 
 -- A bounded generic works for structs and foreign types alike. The bound
 -- reaches a bare `T` parameter only: under an array it would make the

@@ -1,7 +1,7 @@
 -- Sugar. Every form here is a shape Luau rejects today, with a one-line emit.
 
-local Players = game:GetService('Players')
-local Workspace = game:GetService('Workspace')
+const Players = game:GetService('Players')
+const Workspace = game:GetService('Workspace')
 
 -- Default parameters. The nil checks land on the `)` line.
 -- emits: function move(part: BasePart, speed: number?, options: { [string]: unknown }?)
@@ -35,16 +35,16 @@ impl Menu
 end
 
 -- String literal receiver. emits: ("abc"):upper()
-local upper = 'abc':upper()
-local parts = `a,b,{upper}`:split(',')
+const upper = 'abc':upper()
+const parts = `a,b,{upper}`:split(',')
 
 -- Table spread through a typed helper. Metatables survive.
 type Config = { volume: number, muted: boolean, name: string? }
-local base: Config = { volume = 0.5, muted = false }
-local loud = { ...base, volume = 1 }
+const base: Config = { volume = 0.5, muted = false }
+const loud = { ...base, volume = 1 }
 
 -- `satisfies` checks without widening.
-local config = { volume = 0.2, muted = true, name = 'quiet' } satisfies Config
+const config = { volume = 0.2, muted = true, name = 'quiet' } satisfies Config
 
 -- Optional call and optional-chain assignment.
 type Handler = { on_done: ((number) -> ())?, target: { Health: number }? }
@@ -74,17 +74,17 @@ local function describe(value: unknown) -> string
 end
 
 -- Bitwise word operators emit bit32 calls.
-local READ, WRITE, EXEC = 1, 2, 4
-local flags = READ bor WRITE
-local can_write = (flags band WRITE) ~= 0
-local toggled = flags bxor EXEC
-local inverted = bnot flags
-local shifted = 1 shl 4
-local back = shifted shr 2
+const READ, WRITE, EXEC = 1, 2, 4
+const flags = READ bor WRITE
+const can_write = (flags band WRITE) ~= 0
+const toggled = flags bxor EXEC
+const inverted = bnot flags
+const shifted = 1 shl 4
+const back = shifted shr 2
 
 -- Array destructuring, with a rest binding.
-local [ first, second ] = [ 10, 20, 30 ]
-local [ head, ...rest ] = [ 1, 2, 3, 4 ]
+const [ first, second ] = [ 10, 20, 30 ]
+const [ head, ...rest ] = [ 1, 2, 3, 4 ]
 local function pair([ x, y ]: number[]): number
   return x + y
 end
@@ -99,29 +99,30 @@ end
 
 -- `c ? a : b` is `if c then a else b`. A `:` that touches its receiver
 -- stays a method call inside a branch; the else marker has a space before it.
-local level = 7
-local tier = level > 5 ? tostring(level):rep(2) : 'low'
+const level = 7
+const tier = level > 5 ? tostring(level):rep(2) : 'low'
 print(tier)
 
 -- Struct field defaults fill in the raw constructor.
-local menu = new Menu { button = new Instance('TextButton') }
+const menu = new Menu { button = new Instance('TextButton') }
 print(menu.opens) -- 0
 
 -- `async do` gives a Future from a block, and stands alone as a
 -- statement when the Future is not wanted. `await` needs one of these:
 -- at a module's top level the yield would land in `require`.
-local loaded = async do
-  local part = Workspace=>Map=>Spawn
+const loaded = async do
+  -- A child names no class, so the cast says which one it is.
+  const part = Workspace=>Map=>Spawn :: BasePart
   return part.Position
 end
 
-local spawn_position = async do
+const spawn_position = async do
   return await loaded
 end
 
 -- The object initializer: an optional table after any `new X(...)`.
 -- Each field lands on its own line. `Parent` goes last.
-local part = new Instance('Part') {
+const part = new Instance('Part') {
   Name = 'Marker',
   Size = Vector3.new(1, 1, 1),
   Anchored = true,
@@ -130,7 +131,7 @@ local part = new Instance('Part') {
 
 -- A struct constructs through `new` alone: the fields form when the
 -- struct writes no constructor, `new Name(...)` when its impl does.
-local menu2 = new Menu {
+const menu2 = new Menu {
   button = Instance.new('TextButton'),
   opens = 3,
 }

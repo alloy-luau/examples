@@ -5,7 +5,7 @@
 -- share behavior. There is no inheritance: compose structs, share behavior
 -- through traits.
 
-local Players = game:GetService('Players')
+const Players = game:GetService('Players')
 
 -- 1. A plain class: struct + impl. No trait needed.
 -- `@derive(Debug)` writes `debug(self)` and, since Health has no Display
@@ -199,8 +199,8 @@ end
 
 -- Usage.
 
-local ana = new Character(Players:GetPlayers()[1])
-local bo = new Character(Players:GetPlayers()[2])
+const ana = new Character(Players:GetPlayers()[1])
+const bo = new Character(Players:GetPlayers()[2])
 
 ana:equip(new Sword(12))
 bo:equip(new Bow(5, 3))

@@ -52,7 +52,7 @@ local function handle(msg: Msg)
       p:LoadCharacterAsync()
     case Chat(p, text) then
       -- An arm is its own scope and may return.
-      local line = `{p.Name}: {text}`
+      const line = `{p.Name}: {text}`
       print(line)
       return
     default
@@ -100,7 +100,7 @@ local function leap(year: number): boolean
 end
 
 -- Result is an ordinary library enum.
-local parsed: Result<number, string> = Ok(1)
+const parsed: Result<number, string> = Ok(1)
 match parsed with
   case Ok(n) then print(n)
   case Err(e) then warn(e)

@@ -13,7 +13,7 @@ export type Inventory = { [number]: Item }
 export const MAX_STACK = 99
 
 -- The version of the inventory format.
-export local version = '1.0.0'
+export const version = '1.0.0'
 
 -- Adds an item, stacking it on an item of the same id.
 export function add(inv: Inventory, item: Item): Inventory

@@ -16,7 +16,7 @@ end
 -- A parameter used twice expands twice. Bind a local to evaluate once.
 -- The local is renamed on expansion and never captures a caller's name.
 macro square(x)
-  local value = x
+  const value = x
   value * value
 end
 
@@ -44,25 +44,25 @@ end
 
 -- Usage.
 
-local speed = 24
-local ratio = $clamp01(speed / 16) -- math.clamp(speed / 16, 0, 1)
+const speed = 24
+const ratio = $clamp01(speed / 16) -- math.clamp(speed / 16, 0, 1)
 $log(ratio) -- print(`[...] ratio = {ratio}`)
-local area = $square(speed + 1) -- one evaluation of speed + 1
+const area = $square(speed + 1) -- one evaluation of speed + 1
 $log_squared(ratio)
-local tries = $retry_count()
+const tries = $retry_count()
 
 -- Highlighting, side by side. The first three are macro calls, by the
 -- `$`. The rest are non-nil asserts, and an assert may be followed by a
 -- call with no parentheses.
-local a = $clamp01(ratio)
-local b = $square(ratio)
+const a = $clamp01(ratio)
+const b = $square(ratio)
 $dbg(ratio)
 
 type Handler = { on_done: ((number) -> number)?, target: BasePart? }
-local handler: Handler = { on_done = nil, target = nil }
-local part = handler.target! -- assert, no call
-local size = handler.target!.Size -- assert, then index
-local done = handler.on_done!(1) -- assert, then call
+const handler: Handler = { on_done = nil, target = nil }
+const part = handler.target! -- assert, no call
+const size = handler.target!.Size -- assert, then index
+const done = handler.on_done!(1) -- assert, then call
 handler.on_done?(2) -- call only when present
 
 -- `handler.on_done(1)` with no `!` or `?` is the plain call, which

@@ -4,7 +4,7 @@ import { Attributes } from '@alloy/std/roblox'
 -- User-defined attributes: declared metadata with checked placement and
 -- typed arguments. Nothing is transformed. Consumers read the metadata.
 
-local DataStoreService = game:GetService('DataStoreService')
+const DataStoreService = game:GetService('DataStoreService')
 
 -- Declarations name the arguments and the targets. `export` makes one
 -- usable from other files, both to apply and to read.
@@ -46,7 +46,7 @@ end
 
 -- `@deny_unknown_fields` makes a typo in stored data fail at the load:
 -- `from_table({ maxHeath = 100 })` raises "Health has no field maxHeath".
-local stored = Health.from_table({ hp = 80, maxHealth = 100, regen_per_second = 2 })
+const stored = Health.from_table({ hp = 80, maxHealth = 100, regen_per_second = 2 })
 
 -- A star import reaches the same names through the module.
 @derive(serde.Deserialize)
@@ -55,7 +55,7 @@ struct Settings
   volume: number = 1
 end
 
-local settings = Settings.from_table({ volume = 0.5 })
+const settings = Settings.from_table({ volume = 0.5 })
 
 @icon('rbxassetid:/200')
 enum Team
@@ -70,11 +70,11 @@ local function save(player: Player, health: Health)
 end
 
 -- Reading at runtime. Results are typed from the declaration.
-local field_range = Attributes.field(Health, 'current', range) -- { min: number, max: number }?
-local struct_icon = Attributes.get(Health, icon) -- string?
-local red_icon = Attributes.variant(Team, 'Red', icon)
-local on_save = Attributes.of(save) -- every attribute on save
-local guarded = Attributes.get(save, server_only) ~= nil
+const field_range = Attributes.field(Health, 'current', range) -- { min: number, max: number }?
+const struct_icon = Attributes.get(Health, icon) -- string?
+const red_icon = Attributes.variant(Team, 'Red', icon)
+const on_save = Attributes.of(save) -- every attribute on save
+const guarded = Attributes.get(save, server_only) ~= nil
 
 -- A wrong target is a compile error:
 -- @range(0, 1)
@@ -117,7 +117,7 @@ end
 @allow(flux.explicit_any)
 local function validate<T>(value: T, struct_type: any) -> Result<T, string>
   for name, r in Attributes.fields(struct_type, range) do
-    local v = (value :: any)[name]
+    const v = (value :: any)[name]
     if v < r.min or v > r.max then
       return Err(`{name} must be in [{r.min}, {r.max}]`)
     end

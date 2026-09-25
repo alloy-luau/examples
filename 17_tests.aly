@@ -1,7 +1,7 @@
 -- Inline tests. `@test` functions run under `alloy test` and are blanked
 -- from the ship artifact, line for line.
 
-local Players = game:GetService('Players')
+const Players = game:GetService('Players')
 
 local function clamp01(x: number): number
   return math.clamp(x, 0, 1)
@@ -26,7 +26,7 @@ end
 -- A test may be async. The runner awaits it.
 @test
 async function loads_within_a_frame()
-  local value = await Future.delay(0)
+  const value = await Future.delay(0)
   $assert(value == nil)
 end
 

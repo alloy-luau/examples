@@ -71,9 +71,9 @@ export remote JoinTeam(team: Team) from client
 
 -- 2. Server. The handler always receives the sender first.
 
-local RunService = game:GetService('RunService')
-local Players = game:GetService('Players')
-local ReplicatedStorage = game:GetService('ReplicatedStorage')
+const RunService = game:GetService('RunService')
+const Players = game:GetService('Players')
+const ReplicatedStorage = game:GetService('ReplicatedStorage')
 
 if RunService:IsServer() then
   Damage.on(function(sender: Player, target: Player, amount: number)
@@ -90,8 +90,8 @@ if RunService:IsServer() then
 
   -- An async handler: the runtime awaits the Future before it replies.
   GetProfile.on(async function(sender: Player, id: number): Profile
-    local store = game:GetService('DataStoreService'):GetDataStore('profiles')
-    local raw = store:GetAsync(`profile/{id}`)
+    const store = game:GetService('DataStoreService'):GetDataStore('profiles')
+    const raw = store:GetAsync(`profile/{id}`)
     return new Profile { id = id, name = sender.Name, level = raw?.level ?? 1, tags = [] }
   end)
 
@@ -123,7 +123,7 @@ if RunService:IsClient() then
   -- `try await` returns the Err from the function it sits in, so it
   -- wants one that gives back a Result.
   local async function safe_profile(): Result<Profile, any>
-    local profile = try await GetProfile.call(4) -- Err on timeout or failure
+    const profile = try await GetProfile.call(4) -- Err on timeout or failure
     return Ok(profile)
   end
 
@@ -131,17 +131,17 @@ if RunService:IsClient() then
   -- module, so the awaits sit in an `async do` block; in a
   -- `*.client.aly` script they would stand at the top level.
   async do
-    local profile = await GetProfile.call(1)
+    const profile = await GetProfile.call(1)
     print(profile)
-    local both = await Future.all([ GetProfile.call(2), GetProfile.call(3) ])
-    local safe = await safe_profile()
+    const both = await Future.all([ GetProfile.call(2), GetProfile.call(3) ])
+    const safe = await safe_profile()
 
     -- `wait` returns a Future of the next payload.
-    local message, seconds = await Toast.wait()
+    const message, seconds = await Toast.wait()
     print(message, seconds, both, safe)
   end
 
-  local pending = GetProfile.call(5)
+  const pending = GetProfile.call(5)
   pending:cancel()
   Damage.fire(Players.LocalPlayer, 10)
   JoinTeam.fire(Team.Red)
@@ -158,6 +158,6 @@ if RunService:IsClient() then
 
   -- A plain RemoteEvent still works beside the typed ones, and
   -- `remote` is free as a local name.
-  local remote = ReplicatedStorage=>Legacy :: RemoteEvent
+  const remote = ReplicatedStorage=>Legacy :: RemoteEvent
   remote:FireServer('hello')
 end
