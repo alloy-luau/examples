@@ -33,7 +33,7 @@ print(#xs, xs:len(), xs:contains(2), last, same)
 
 -- `swap_remove` fills the gap with the last item. It costs the same at
 -- any length, and the order changes.
-const slots = [ 'a', 'b', 'c', 'd' ]
+local slots = [ 'a', 'b', 'c', 'd' ]
 const taken = slots:swap_remove(1) -- 'a'; slots is now d, b, c
 
 -- A raw table from the engine has no methods. Upgrade it in place, or use
