@@ -1,17 +1,17 @@
 -- Nested patterns, or-patterns, struct, table, and array patterns.
 
-enum Shape as
+enum Shape
   Circle(number)
   Rect(number, number)
 end
 
-enum Event as
+enum Event
   Spawn(Player, Vector3)
   Hit(Player, Shape)
   Leave(Player)
 end
 
-struct Config as
+struct Config
   name: string
   volume: number
 end
@@ -19,7 +19,7 @@ end
 -- Nested variant patterns.
 local function describe(event: Event): string
   return match event with
-    case Hit(p, Circle(r)) and r > 10 then `{p.Name} hit a big circle`
+    case Hit(p, Circle(r)) where r > 10 then `{p.Name} hit a big circle`
     case Hit(p, Circle(r)) then `{p.Name} hit a circle of {r}`
     case Hit(p, Rect(w, h)) then `{p.Name} hit a {w}x{h} rect`
     -- An or-pattern binds the same names on both sides.
@@ -28,7 +28,7 @@ local function describe(event: Event): string
 end
 
 -- Result inside an optional-like enum.
-enum Loaded as
+enum Loaded
   Some(Result<Config, string>)
   None
 end
@@ -46,7 +46,7 @@ end
 -- Struct patterns test the metatable, then bind fields.
 local function loud(value: any): boolean --@alloy-ignore the patterns take any value
   return match value with
-    case Config { volume } and volume > 0.8 then true
+    case Config { volume } where volume > 0.8 then true
     case Config { name = 'siren' } then true
     default false
   end
@@ -56,7 +56,7 @@ end
 local function kind_of(t: { kind: string, size: number? }): string
   return match t with
     case { kind = 'circle', size = _ } then 'circle'
-    case { kind = 'rect', size } and size ~= nil then `rect of {size}`
+    case { kind = 'rect', size } where size ~= nil then `rect of {size}`
     case { kind } then kind
     default 'unknown'
   end

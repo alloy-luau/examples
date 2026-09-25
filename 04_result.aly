@@ -35,6 +35,19 @@ end
 local config = decode('{"volume":"0.5","muted":"false"}')
 local volume = config:map(function(c) return c.volume end):unwrap_or(1)
 
+-- `and_then` runs a next step that can fail too. `or_else` tries a
+-- fallback on Err. `unwrap_or_else` calls its function only on Err.
+local function audible(v: number): Result<number, string>
+  return if v > 0 then Ok(v) else Err('volume is muted')
+end
+
+local checked = parse_volume('0.4'):and_then(audible)
+local retried = parse_volume('loud'):or_else(function() return parse_volume('0.5') end)
+local quiet = parse_volume('?'):unwrap_or_else(function(msg)
+  warn(msg)
+  return 0
+end)
+
 -- `unwrap` and `expect` throw on Err, with the stored traceback.
 local loud = parse_volume('0.9'):expect('volume must parse')
 
@@ -66,4 +79,4 @@ local async function fetch_or_err(url: string): Result<string, string>
   return Ok(body)
 end
 
-print(volume, loud, fetch_or_err, load_both)
+print(volume, loud, fetch_or_err, load_both, checked, retried, quiet)

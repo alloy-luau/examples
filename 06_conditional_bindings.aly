@@ -2,7 +2,7 @@
 
 local Players = game:GetService('Players')
 
-enum Job as
+enum Job
   Build(string)
   Move(Vector3)
 end

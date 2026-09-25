@@ -1,9 +1,15 @@
--- The standard library. Every name here is ambient: no import needed.
--- Emit adds one require of the std on the first code line.
+import { HashMap, Set, BitSet, Symbol, Queue, Heap } from '@alloy/std/collections'
+import { Scope } from '@alloy/std/async'
+import { Iter } from '@alloy/std/iter'
+-- The standard library. A file imports each std name it uses. Future,
+-- Result, Ok, Err, Array, and the traits need no import. Emit adds one
+-- require of the std on the first code line.
 
 -- Array literals are one-indexed tables with the shared Array metatable.
 local xs = [ 1, 2, 3 ]
+-- `[[` opens a Luau long string, so a nested array starts `[ [`.
 local grid: Array<number[] | number[]> = [ [ 1, 2 ], [ 3, 4 ] ]
+local help = [[a Luau long string]]
 
 -- `T[]` and `Array<T>` name the same type. `{ T }` is a raw table.
 local a: number[] = [ 1 ]
@@ -24,6 +30,11 @@ local total = xs:filter(function(x) return x % 2 == 1 end):reduce(
 xs:push(4)
 local last = xs:pop()
 print(#xs, xs:len(), xs:contains(2), last, same)
+
+-- `swap_remove` fills the gap with the last item. It costs the same at
+-- any length, and the order changes.
+local slots = [ 'a', 'b', 'c', 'd' ]
+local taken = slots:swap_remove(1) -- 'a'; slots is now d, b, c
 
 -- A raw table from the engine has no methods. Upgrade it in place, or use
 -- the free form.
@@ -55,7 +66,14 @@ seen:add(4)
 local both = seen:intersection(Set.from([ 3, 4, 5 ]))
 print(seen:has(2), both:len(), both:to_array())
 
--- Future is ambient too. This file is a module, so `await` goes inside
+-- BitSet holds whole numbers at one bit each. It suits dense ids.
+local visited = BitSet.new(1024)
+visited:add(7):add(40)
+for tile in visited do
+  print(tile) -- 7, then 40
+end
+
+-- Future needs no import. This file is a module, so `await` goes inside
 -- an `async do` block: at a module's top level the yield lands in
 -- `require`. The block is an expression, and its value is a Future.
 local ready = Future.resolve(42)
@@ -77,7 +95,7 @@ local CHILDREN = Symbol.new('Children')
 local props = { [CHILDREN] = [], Name = 'x' }
 print(tostring(CHILDREN), props[CHILDREN])
 
--- Result is ambient, with Ok and Err.
+-- Result, Ok, and Err need no import.
 local parsed: Result<number, string> = Ok(1)
 local value = parsed:map(function(n) return n + 1 end):unwrap_or(0)
 local maybe: number? = parsed:ok()
@@ -98,10 +116,14 @@ local heartbeat = scope:add(game:GetService('RunService').Heartbeat:Connect(func
 scope:add(function() print('scope closed') end)
 delete scope
 
--- Iter: a lazy chain; nothing runs until `collect` pulls.
-local big_evens = Iter.range(1, 100):filter(function(n) return n % 2 == 0 end):map(
-  function(n) return n * n end
-):take(3):collect()
+-- Iter: a lazy chain; nothing runs until `collect` pulls. There is one
+-- Iter type, so each callback in a chain knows its parameter type.
+local big_evens = Iter.range(1, 100)
+  :filter(function(n) return n % 2 == 0 end)
+  :map(function(n) return n * n end)
+  :map(function(square) return `#{square}` end)
+  :take(3)
+  :collect()
 
 print(doubled, total, ana, hits, first, value, maybe, buffer, grid, c)
-print(next_job, jobs:len(), nearest, heartbeat, big_evens)
+print(next_job, jobs:len(), nearest, heartbeat, big_evens, slots:join(', '), taken, help)

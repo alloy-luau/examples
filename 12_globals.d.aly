@@ -13,24 +13,24 @@ declare plugin: Plugin
 
 -- Alloy type sugar works here too. Every type is global, with or
 -- without `export`.
-interface Serializable as
+interface Serializable
   read version: number
   write debug_sink: (string) -> ()
 end
 
-interface SaveData extends Serializable as
+interface SaveData extends Serializable
   coins: number
   items: { string }
 end
 
-trait Codec as
+trait Codec
   function encode(self): string
   function decode(self, raw: string): SaveData
 end
 
 -- An enum is a type alone here. The host gives the values, and a
 -- file writes one as its string: `local q: Quality = "High"`.
-enum Quality as
+enum Quality
   Low,
   High,
 end

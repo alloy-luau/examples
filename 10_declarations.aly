@@ -44,11 +44,11 @@ delete part
 delete folder
 
 -- An Alloy struct opts in to `delete` through Drop, which emits Destroy.
-struct Timer as
+struct Timer
   connection: RBXScriptConnection?
 end
 
-impl Drop for Timer as
+impl Drop for Timer
   function drop(self)
     self.connection?:Disconnect()
   end

@@ -1,14 +1,14 @@
 -- Visibility. A field or an impl method marked `private` belongs to the
 -- struct's own methods. Everything else is public, and `public` is the
--- word for saying so out loud. Both words are reserved.
+-- word for saying so out loud. Both words still work as local names.
 
-struct Counter as
+struct Counter
   public read name: string
   private count: number = 0
   private history: number[] = []
 end
 
-impl Counter as
+impl Counter
   function bump(self): number
     self.count += 1
     self:record()

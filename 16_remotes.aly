@@ -41,16 +41,27 @@ export remote Heal(@u8 amount: number) from client
 @immediate
 export remote Fire(origin: Vector3, direction: Vector3) from client
 
+-- `@wire` picks the encoding. `buffer` packs the payload by its layout,
+-- with each number at its width. Without `@wire` the compiler picks the
+-- encoding that sends fewer bytes.
+@wire(buffer)
+export remote Sync(@u8 health: number, @f32 speed: number) from server
+
+-- `table` sends the payload as Roblox encodes a table. A lone string
+-- gains nothing in a buffer.
+@wire(table)
+export remote Log(line: string) from server
+
 -- Structs and enums serialize by their declarations.
 @derive(Debug)
-struct Profile as
+struct Profile
   read id: number
   name: string
   level: number
   tags: string[]
 end
 
-enum Team as
+enum Team
   Red
   Blue
 end
@@ -62,6 +73,7 @@ export remote JoinTeam(team: Team) from client
 
 local RunService = game:GetService('RunService')
 local Players = game:GetService('Players')
+local ReplicatedStorage = game:GetService('ReplicatedStorage')
 
 if RunService:IsServer() then
   Damage.on(function(sender: Player, target: Player, amount: number)
@@ -92,6 +104,8 @@ if RunService:IsServer() then
   end)
 
   Toast.fire_all('Server started')
+  Sync.fire_all(100, 16)
+  Log.fire_all('ready')
 end
 
 -- 3. Client. The surface exposes only what the direction allows.
@@ -141,4 +155,9 @@ if RunService:IsClient() then
 
   -- `once` is the callback form of `wait`.
   Toast.once(function(message) print('first toast', message) end)
+
+  -- A plain RemoteEvent still works beside the typed ones, and
+  -- `remote` is free as a local name.
+  local remote = ReplicatedStorage=>Legacy :: RemoteEvent
+  remote:FireServer('hello')
 end

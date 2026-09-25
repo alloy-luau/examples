@@ -19,12 +19,12 @@ end
 
 -- Method reference. `obj:name` with no call binds `self`.
 -- emits: button.Activated:Connect(bind(self, self.on_click))
-struct Menu as
+struct Menu
   button: TextButton
   opens: number = 0
 end
 
-impl Menu as
+impl Menu
   function on_click(self): ()
     self.opens += 1
   end
@@ -142,7 +142,7 @@ end
 
 -- `@derive` on an enum.
 @derive(Debug, Eq)
-enum Tile as
+enum Tile
   Empty
   Wall(number)
 end

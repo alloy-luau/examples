@@ -1,3 +1,5 @@
+import { Serialize, Deserialize } from '@alloy/std/serde'
+import { Attributes } from '@alloy/std/roblox'
 -- User-defined attributes: declared metadata with checked placement and
 -- typed arguments. Nothing is transformed. Consumers read the metadata.
 
@@ -9,7 +11,8 @@ export attribute range(min: number, max: number) on field
 -- Marks a function that runs on the server only.
 export attribute server_only on function
 attribute icon(asset: string) on struct, enum, variant
--- `@rename` and `@skip` are built in: `@derive(Serialize)` reads them.
+-- The serde options are built in, and the serde derives read them:
+-- `@rename_all`, `@deny_unknown_fields`, `@rename`, `@alias`, `@skip`.
 
 -- Another file would write:
 --   import { range, server_only } from "./21_attributes"
@@ -18,23 +21,33 @@ attribute icon(asset: string) on struct, enum, variant
 --   local r = Attributes.field(Health, "current", range)
 
 @icon('rbxassetid:/100')
-@derive(Serialize)
-struct Health as
+@derive(Serialize, Deserialize)
+@rename_all('camelCase')
+@deny_unknown_fields
+struct Health
+  -- `from_table` also reads this field from the key `hp`.
   @range(0, 100)
-  current: number
+  @alias('hp')
+  current: number = 100
 
-  max: number
+  -- `@rename_all` gives this field the key `maxHealth`.
+  max_health: number
 
-  -- Serialize honors rename and skip.
+  -- A field's own `@rename` wins over `@rename_all`.
   @rename('regen_per_second')
   regen: number
 
+  -- `@skip` keeps a field out of the table.
   @skip
   last_hit: number?
 end
 
+-- `@deny_unknown_fields` makes a typo in stored data fail at the load:
+-- `from_table({ maxHeath = 100 })` raises "Health has no field maxHeath".
+local stored = Health.from_table({ hp = 80, maxHealth = 100, regen_per_second = 2 })
+
 @icon('rbxassetid:/200')
-enum Team as
+enum Team
   @icon('rbxassetid:/201')
   Red
   Blue
@@ -60,10 +73,39 @@ local guarded = Attributes.get(save, server_only) ~= nil
 -- @range("low", "high")
 -- current: number
 
+-- Luau's own attribute list passes through, so a Luau file stays valid
+-- Alloy. `deprecated` there takes Luau's table.
+@[native]
+local function mix(a: number, b: number, t: number): number
+  return a + (b - a) * t
+end
+
+-- A call to `blend` draws a lint that names `mix`.
+@[deprecated { use = 'mix', reason = 'renamed' }]
+local function blend(a: number, b: number, t: number): number
+  return mix(a, b, t)
+end
+
+-- `@deprecated` is the short form.
+@deprecated('renamed to mix')
+local function fade(a: number, b: number, t: number): number
+  return mix(a, b, t)
+end
+
+-- `@allow(lint)` quiets one lint on the item it sits on, and moves with
+-- the item. A `--@alloy-` directive covers one line, a run of lines, or
+-- a file. `dead_code` is Rust's name for `unused_function`.
+@allow(dead_code)
+local function dump(health: Health)
+  print(health:to_table())
+end
+
 -- A generic validator reads the metadata instead of hard-coding rules.
-local function validate<T>(value: T, struct_type: any) -> Result<T, string> --@alloy-ignore any struct
+-- A lint name may carry its tool: `flux.` here, or `luau.` or `alx.`.
+@allow(flux.explicit_any)
+local function validate<T>(value: T, struct_type: any) -> Result<T, string>
   for name, r in Attributes.fields(struct_type, range) do
-    local v = (value :: any)[name] --@alloy-ignore a field by name
+    local v = (value :: any)[name]
     if v < r.min or v > r.max then
       return Err(`{name} must be in [{r.min}, {r.max}]`)
     end
@@ -72,3 +114,4 @@ local function validate<T>(value: T, struct_type: any) -> Result<T, string> --@a
 end
 
 print(field_range, struct_icon, red_icon, on_save, guarded, validate)
+print(stored, mix(0, 10, 0.5))
