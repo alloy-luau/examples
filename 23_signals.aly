@@ -1,6 +1,6 @@
 import { Signal } from '@alloy/std/signal'
--- Signals. `Signal` is ambient std. It has the shape of RBXScriptSignal,
--- so code that takes either works with both.
+-- Signals. `Signal` comes from `@alloy/std/signal`. It has the shape of
+-- RBXScriptSignal, so code that takes either works with both.
 
 local Players = game:GetService('Players')
 local RunService = game:GetService('RunService')

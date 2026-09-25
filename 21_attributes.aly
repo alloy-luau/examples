@@ -1,4 +1,5 @@
-import { Serialize, Deserialize } from '@alloy/std/serde'
+import { Serialize, Deserialize, rename, rename_all, skip, deny_unknown_fields } from '@alloy/std/serde'
+import * as serde from '@alloy/std/serde'
 import { Attributes } from '@alloy/std/roblox'
 -- User-defined attributes: declared metadata with checked placement and
 -- typed arguments. Nothing is transformed. Consumers read the metadata.
@@ -11,8 +12,9 @@ export attribute range(min: number, max: number) on field
 -- Marks a function that runs on the server only.
 export attribute server_only on function
 attribute icon(asset: string) on struct, enum, variant
--- The serde options are built in, and the serde derives read them:
--- `@rename_all`, `@deny_unknown_fields`, `@rename`, `@alias`, `@skip`.
+-- serde's options come from `@alloy/std/serde` with the derives that
+-- read them: `@rename_all`, `@deny_unknown_fields`, `@rename`, `@skip`.
+-- `@alias` is built in: it gives a field a second key.
 
 -- Another file would write:
 --   import { range, server_only } from "./21_attributes"
@@ -45,6 +47,15 @@ end
 -- `@deny_unknown_fields` makes a typo in stored data fail at the load:
 -- `from_table({ maxHeath = 100 })` raises "Health has no field maxHeath".
 local stored = Health.from_table({ hp = 80, maxHealth = 100, regen_per_second = 2 })
+
+-- A star import reaches the same names through the module.
+@derive(serde.Deserialize)
+@serde.deny_unknown_fields
+struct Settings
+  volume: number = 1
+end
+
+local settings = Settings.from_table({ volume = 0.5 })
 
 @icon('rbxassetid:/200')
 enum Team
@@ -80,13 +91,14 @@ local function mix(a: number, b: number, t: number): number
   return a + (b - a) * t
 end
 
--- A call to `blend` draws a lint that names `mix`.
-@[deprecated { use = 'mix', reason = 'renamed' }]
+-- `@deprecated` takes a message, or the table Luau's list takes: `use`
+-- names the function to call instead, so a call to `blend` draws a lint
+-- that names `mix`.
+@deprecated({ use = 'mix', reason = 'renamed' })
 local function blend(a: number, b: number, t: number): number
   return mix(a, b, t)
 end
 
--- `@deprecated` is the short form.
 @deprecated('renamed to mix')
 local function fade(a: number, b: number, t: number): number
   return mix(a, b, t)
@@ -114,4 +126,4 @@ local function validate<T>(value: T, struct_type: any) -> Result<T, string>
 end
 
 print(field_range, struct_icon, red_icon, on_save, guarded, validate)
-print(stored, mix(0, 10, 0.5))
+print(stored, settings, mix(0, 10, 0.5))
