@@ -2,7 +2,7 @@
 -- Every Alloy block closes with `end`.
 
 -- A payload enum desugars to tagged tables.
-enum Msg as
+enum Msg
   Join(Player)
   Chat(Player, string)
   Leave(Player)
@@ -13,14 +13,14 @@ end
 -- Members separate by newline, `,`, or `;`, so one line works too.
 enum Color as Red, Green, Blue end
 
-enum Rarity as
+enum Rarity
   Common;
   Rare;
   Legendary
 end
 
 -- `impl` on an enum adds methods, as on a struct.
-impl Msg as
+impl Msg
   function player(self): Player
     return match self with
       case Join(p) then p
@@ -35,8 +35,8 @@ end
 local function describe(msg: Msg): string
   return match msg with
     case Join(p) then `{p.Name} joined`
-    -- A guard is `and <expr>` after the pattern.
-    case Chat(p, text) and #text > 200 then `{p.Name} sent a wall of text`
+    -- A guard is `where <expr>` after the pattern.
+    case Chat(p, text) where #text > 200 then `{p.Name} sent a wall of text`
     case Chat(p, text) then `{p.Name}: {text}`
     case Leave(p) then `{p.Name} left`
   end
@@ -52,7 +52,7 @@ local function handle(msg: Msg)
       p:LoadCharacterAsync()
     case Chat(p, text) then
       -- An arm is its own scope and may return.
-      local line = `{p.Name}: {text}`
+      const line = `{p.Name}: {text}`
       print(line)
       return
     default
@@ -79,6 +79,16 @@ local function hex(color: Color): string
   end
 end
 
+-- A bare name or `_` matches any value. After literal arms it covers
+-- the rest, so the match needs no `default`.
+local function count_label(n: number): string
+  return match n with
+    case 0 then 'none'
+    case 1 then 'one'
+    case many then `{many} items`
+  end
+end
+
 -- Two scrutinees, from upstream's proposal.
 local function leap(year: number): boolean
   return match year % 400, year % 100, year % 4 with
@@ -90,10 +100,10 @@ local function leap(year: number): boolean
 end
 
 -- Result is an ordinary library enum.
-local parsed: Result<number, string> = Ok(1)
+const parsed: Result<number, string> = Ok(1)
 match parsed with
   case Ok(n) then print(n)
   case Err(e) then warn(e)
 end
 
-print(describe, handle, is_join, hex(Color.Red), leap(2024), Msg.Join)
+print(describe, handle, is_join, hex(Color.Red), count_label(3), leap(2024), Msg.Join)

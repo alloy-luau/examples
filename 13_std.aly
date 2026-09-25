@@ -1,40 +1,51 @@
--- The standard library. Every name here is ambient: no import needed.
--- Emit adds one require of the std on the first code line.
+import { HashMap, Set, BitSet, Symbol, Queue, Heap } from '@alloy/std/collections'
+import { Scope } from '@alloy/std/async'
+import { Iter } from '@alloy/std/iter'
+-- The standard library. A file imports each std name it uses. Future,
+-- Result, Ok, Err, Array, and the traits need no import. Emit adds one
+-- require of the std on the first code line.
 
 -- Array literals are one-indexed tables with the shared Array metatable.
 local xs = [ 1, 2, 3 ]
-local grid: Array<number[] | number[]> = [ [ 1, 2 ], [ 3, 4 ] ]
+-- `[[` opens a Luau long string, so a nested array starts `[ [`.
+const grid: Array<number[] | number[]> = [ [ 1, 2 ], [ 3, 4 ] ]
+const help = [[a Luau long string]]
 
 -- `T[]` and `Array<T>` name the same type. `{ T }` is a raw table.
-local a: number[] = [ 1 ]
-local b: Array<number> = a
-local c: { number } = b -- an Array<T> is accepted as a { T }
+const a: number[] = [ 1 ]
+const b: Array<number> = a
+const c: { number } = b -- an Array<T> is accepted as a { T }
 
 -- An array index is a number. Both lines below are compile errors.
 -- xs["foo"] = 1
 -- local bad = xs.foo
 
 -- Methods and free functions are the same functions.
-local doubled = xs:map(function(x) return x * 2 end)
-local same = Array.map(xs, function(x: number) return x * 2 end)
-local total = xs:filter(function(x) return x % 2 == 1 end):reduce(
+const doubled = xs:map(function(x) return x * 2 end)
+const same = Array.map(xs, function(x: number) return x * 2 end)
+const total = xs:filter(function(x) return x % 2 == 1 end):reduce(
   function(acc: number, x) return acc + x end,
   0
 )
 xs:push(4)
-local last = xs:pop()
+const last = xs:pop()
 print(#xs, xs:len(), xs:contains(2), last, same)
+
+-- `swap_remove` fills the gap with the last item. It costs the same at
+-- any length, and the order changes.
+const slots = [ 'a', 'b', 'c', 'd' ]
+const taken = slots:swap_remove(1) -- 'a'; slots is now d, b, c
 
 -- A raw table from the engine has no methods. Upgrade it in place, or use
 -- the free form.
-local children = Array.from(workspace:GetChildren())
-local names = children:map(function(inst) return inst.Name end)
-local raw_names = Array.map(workspace:GetChildren(), function(inst) return inst.Name end)
+const children = Array.from(workspace:GetChildren())
+const names = children:map(function(inst) return inst.Name end)
+const raw_names = Array.map(workspace:GetChildren(), function(inst) return inst.Name end)
 print(names:join(', '), raw_names:join(', '))
 
 -- Construction with explicit type arguments uses upstream's <<T>> form.
-local ids = new Array<<number>>()
-local buffer = Array.with_capacity(64)
+const ids = new Array<<number>>()
+const buffer = Array.with_capacity(64)
 Array.push(ids, 1)
 
 -- HashMap and Set are Alloy structs, so they carry methods.
@@ -42,30 +53,37 @@ local scores = new HashMap<<string, number>>()
 scores:set('ana', 10)
 scores:set('bo', 7)
 
-local ana = scores:get('ana') ?? 0
+const ana = scores:get('ana') ?? 0
 for name, score in scores:entries() do
   print(name, score)
 end
 
-local hits = scores:get_or_insert('cy', 0)
+const hits = scores:get_or_insert('cy', 0)
 
 local seen = Set.from([ 1, 2, 3 ])
 seen:add(4)
 
-local both = seen:intersection(Set.from([ 3, 4, 5 ]))
+const both = seen:intersection(Set.from([ 3, 4, 5 ]))
 print(seen:has(2), both:len(), both:to_array())
 
--- Future is ambient too. This file is a module, so `await` goes inside
+-- BitSet holds whole numbers at one bit each. It suits dense ids.
+local visited = BitSet.new(1024)
+visited:add(7):add(40)
+for tile in visited do
+  print(tile) -- 7, then 40
+end
+
+-- Future needs no import. This file is a module, so `await` goes inside
 -- an `async do` block: at a module's top level the yield lands in
 -- `require`. The block is an expression, and its value is a Future.
-local ready = Future.resolve(42)
-local timer = Future.delay(1)
-local first = async do
+const ready = Future.resolve(42)
+const timer = Future.delay(1)
+const first = async do
   return await Future.race([ ready, timer ])
 end
 
 -- `in` is membership, dispatched on the container at runtime.
-local test = [ 3, 1, 2, 4 ]
+const test = [ 3, 1, 2, 4 ]
 if 3 in test then
   print('found')
 end
@@ -73,35 +91,39 @@ end
 print(2 in seen, 'ana' in scores, 'bc' in 'abc', not (9 in test))
 
 -- Symbol makes a unique key that no string can collide with.
-local CHILDREN = Symbol.new('Children')
-local props = { [CHILDREN] = [], Name = 'x' }
+const CHILDREN = Symbol.new('Children')
+const props = { [CHILDREN] = [], Name = 'x' }
 print(tostring(CHILDREN), props[CHILDREN])
 
--- Result is ambient, with Ok and Err.
-local parsed: Result<number, string> = Ok(1)
-local value = parsed:map(function(n) return n + 1 end):unwrap_or(0)
-local maybe: number? = parsed:ok()
+-- Result, Ok, and Err need no import.
+const parsed: Result<number, string> = Ok(1)
+const value = parsed:map(function(n) return n + 1 end):unwrap_or(0)
+const maybe: number? = parsed:ok()
 
 -- Queue and Heap: a work list and a priority list.
 local jobs = Queue.from([ 'load', 'spawn', 'greet' ])
 jobs:push('save')
-local next_job = jobs:pop()
+const next_job = jobs:pop()
 
 local open = Heap.new(function(a: { cost: number }, b: { cost: number }) return a.cost < b.cost end)
 open:push({ cost = 9 })
 open:push({ cost = 2 })
-local nearest = open:pop()
+const nearest = open:pop()
 
 -- Scope: a cleanup bag that `delete` drains, newest first.
 local scope = Scope.new()
-local heartbeat = scope:add(game:GetService('RunService').Heartbeat:Connect(function() end))
+const heartbeat = scope:add(game:GetService('RunService').Heartbeat:Connect(function() end))
 scope:add(function() print('scope closed') end)
 delete scope
 
--- Iter: a lazy chain; nothing runs until `collect` pulls.
-local big_evens = Iter.range(1, 100):filter(function(n) return n % 2 == 0 end):map(
-  function(n) return n * n end
-):take(3):collect()
+-- Iter: a lazy chain; nothing runs until `collect` pulls. There is one
+-- Iter type, so each callback in a chain knows its parameter type.
+const big_evens = Iter.range(1, 100)
+  :filter(function(n) return n % 2 == 0 end)
+  :map(function(n) return n * n end)
+  :map(function(square) return `#{square}` end)
+  :take(3)
+  :collect()
 
 print(doubled, total, ana, hits, first, value, maybe, buffer, grid, c)
-print(next_job, jobs:len(), nearest, heartbeat, big_evens)
+print(next_job, jobs:len(), nearest, heartbeat, big_evens, slots:join(', '), taken, help)

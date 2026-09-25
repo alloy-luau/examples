@@ -1,7 +1,7 @@
 -- Async functions return a Future. `await` yields until it settles.
 
-local HttpService = game:GetService('HttpService')
-local DataStoreService = game:GetService('DataStoreService')
+const HttpService = game:GetService('HttpService')
+const DataStoreService = game:GetService('DataStoreService')
 
 type Profile = { name: string, level: number }
 
@@ -9,8 +9,8 @@ type Profile = { name: string, level: number }
 -- The body runs on task.spawn under xpcall. The Future stores the result.
 -- `async` sits where `function` sits, after `local`, `const`, or `export`.
 local async function load_profile(user_id: number) -> Profile
-  local store = DataStoreService:GetDataStore('profiles')
-  local raw = store:GetAsync(`profile/{user_id}`)
+  const store = DataStoreService:GetDataStore('profiles')
+  const raw = store:GetAsync(`profile/{user_id}`)
   return HttpService:JSONDecode(raw)
 end
 
@@ -28,7 +28,7 @@ end
 -- body. The context is per function: a `function` inside an `async
 -- function` is plain again.
 local async function greet(user_id: number)
-  local profile = await load_profile(user_id)
+  const profile = await load_profile(user_id)
   print(`Welcome back, {profile.name} (level {profile.level})`)
 end
 
@@ -43,7 +43,7 @@ local async function ranked(ids: { number }): { number }
     levels[id] = (await load_profile(id)).level
   end
 
-  local order = table.clone(ids)
+  const order = table.clone(ids)
   table.sort(order, function(a, b)
     -- `await load_profile(a)` here is the error the rule catches.
     return levels[a] < levels[b]
@@ -61,19 +61,19 @@ end
 -- error with the traceback captured at the failure site. This file is a
 -- module, so its top level runs inside `require`: the reads go in an
 -- `async do` block, which starts a thread of its own.
-local first = load_profile(1)
-local twice = async do
-  local again = await first
-  local same = await first
+const first = load_profile(1)
+const twice = async do
+  const again = await first
+  const same = await first
   print(again.name == same.name)
 end
 
 -- Cancellation stops work that has not started and rejects waiters.
-local slow = load_many({ 1, 2, 3 })
+const slow = load_many({ 1, 2, 3 })
 slow:cancel()
 
 -- An async function expression.
-local ping = async function(): number
+const ping = async function(): number
   return os.clock()
 end
 

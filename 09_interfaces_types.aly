@@ -1,31 +1,32 @@
+import { Partial, Readonly } from '@alloy/std/types'
 -- `interface` is sugar over `type` with `extends`. Mapped types compile
 -- to a generated type function that the real solver runs.
 
-interface Named as
+interface Named
   name: string
 end
 
-interface Positioned as
+interface Positioned
   position: Vector3
 end
 
 -- `read` and `write` are upstream's property modifiers.
 -- A read field cannot be assigned through this type. A write field
 -- cannot be read through it, which makes a sink.
-interface Logged as
+interface Logged
   read id: number
   write log: string
 end
 
 -- A known interface base flattens into one table type at emit.
 -- emits: type Entity = { name: string, position: Vector3, id: number }
-interface Entity extends Named, Positioned as
+interface Entity extends Named, Positioned
   id: number
 end
 
 -- An arbitrary base type falls back to `&`.
 type Tagged = { tags: { string } }
-interface TaggedEntity extends Tagged as
+interface TaggedEntity extends Tagged
   id: number
 end
 
@@ -39,7 +40,7 @@ type Sink<T> = { [K in keyof T]: write T[K] }
 
 -- Plain type functions stay available.
 type function Keys(t)
-  local out: { any } = {}
+  const out: { any } = {}
   for k in t:properties() do
     table.insert(out, k)
   end
@@ -54,8 +55,8 @@ local function patch(entity: Entity, changes: Partial<Entity>): Entity
   }
 end
 
-local frozen: Readonly<Entity> = table.freeze({ id = 1, name = 'a', position = Vector3.zero })
-local keys: Keys<Named> = 'name'
+const frozen: Readonly<Entity> = table.freeze({ id = 1, name = 'a', position = Vector3.zero })
+const keys: Keys<Named> = 'name'
 
 local sink: Sink<{ line: string }> = { line = '' }
 sink.line = 'written'
@@ -72,5 +73,5 @@ local function first_set<T: ~nil>(a: T, b: T): T
 end
 
 type NotText = ~string
-local count: NotText = 3
+const count: NotText = 3
 print(label(1), first_set(1, 2), count)

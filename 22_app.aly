@@ -7,10 +7,10 @@ import type { Item } from './02_modules/inventory'
 -- keeps the checker quiet about the missing module.
 import * as React from '@packages/react' --@alloy-ignore
 
-local items: Item[] = [ { id = 1, name = 'Sword', count = 1 } :: Item ]
+const items: Item[] = [ { id = 1, name = 'Sword', count = 1 } :: Item ]
 
-local function App()
+local function app()
   return React.createElement(InventoryPanel, { items = items, title = 'Bag' })
 end
 
-return App
+return app

@@ -1,11 +1,11 @@
 -- Intrinsics have access to source text and position. The set is closed.
 -- The spelling is a `$` prefix: `$dbg(x)`. Upstream never uses `$`.
 
-local RunService = game:GetService('RunService')
+const RunService = game:GetService('RunService')
 
 local function compute(part: BasePart): number
   -- prints "07_intrinsics.aly:8: part.Size.Magnitude = 12.5" and returns it
-  local size = $dbg(part.Size.Magnitude)
+  const size = $dbg(part.Size.Magnitude)
   return size * 2
 end
 
@@ -36,15 +36,15 @@ local function on_mode(mode: 'client' | 'server')
 end
 
 -- `$nameof` yields the last segment as a string. Renames stay in sync.
-local field = $nameof(RunService.Heartbeat) -- "Heartbeat"
+const field = $nameof(RunService.Heartbeat) -- "Heartbeat"
 
 -- `$stringify` yields the source text of the expression.
-local text = $stringify(1 + 2 * 3) -- "1 + 2 * 3"
+const text = $stringify(1 + 2 * 3) -- "1 + 2 * 3"
 
 -- A user function named like an intrinsic is a plain call without `$`.
 local function dbg(x: number): number
   return x
 end
-local plain = dbg(1)
+const plain = dbg(1)
 
 print(compute, serialize, step, check, on_mode, field, text, plain)

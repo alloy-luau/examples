@@ -24,8 +24,8 @@ local function Row(props: { item: Item, on_select: ((Item) -> ())? })
 end
 
 local function InventoryPanel(props: Props)
-  local title = props.title ?? 'Inventory'
-  local rows = props.items:map(function(item)
+  const title = props.title ?? 'Inventory'
+  const rows = props.items:map(function(item)
     return <Row key={item.id} item={item} on_select={props.on_select} />
   end)
 

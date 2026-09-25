@@ -4,19 +4,19 @@
 -- `derive` is pure codegen. `read` marks a read-only field; `write`
 -- marks a write-only one. Both are upstream modifiers.
 @derive(Eq, Debug, Clone)
-struct Vec2 as
+struct Vec2
   read x: number
   read y: number
 end
 
-struct Log as
+struct Log
   write sink: (string) -> ()
 end
 
 -- `impl` adds methods. `new` is a normal function on the struct table.
 -- `new Vec2 { x = x, y = y }` fills the fields; `new Vec2(x, y)` calls
 -- `Vec2.new`. A construction always takes `new`.
-impl Vec2 as
+impl Vec2
   function new(x: number, y: number): Vec2
     return new Vec2 { x = x, y = y }
   end
@@ -28,7 +28,7 @@ end
 
 -- A trait is a structural contract. A method with a body is a default.
 -- Defaults flatten into each implementing struct at emit time.
-trait Shape as
+trait Shape
   function area(self): number
 
   function describe(self): string
@@ -36,19 +36,19 @@ trait Shape as
   end
 end
 
-struct Circle as
+struct Circle
   radius: number
 end
 
 struct Rect as w: number, h: number end
 
-impl Shape for Circle as
+impl Shape for Circle
   function area(self): number
     return math.pi * self.radius * self.radius
   end
 end
 
-impl Shape for Rect as
+impl Shape for Rect
   function area(self): number
     return self.w * self.h
   end
@@ -60,13 +60,13 @@ end
 
 -- Operator traits map to metamethods.
 -- Add is __add, Eq is __eq, Display is __tostring.
-impl Add for Vec2 as
+impl Add for Vec2
   function add(self, other: Vec2): Vec2
     return Vec2.new(self.x + other.x, self.y + other.y)
   end
 end
 
-impl Display for Vec2 as
+impl Display for Vec2
   function to_string(self): string
     return `({self.x}, {self.y})`
   end
@@ -85,8 +85,30 @@ local function biggest<T: Shape & Display>(a: T, b: T): T
   return if a:area() >= b:area() then a else b
 end
 
-local v = new Vec2(1, 2) + new Vec2(3, 4)
-local shapes: { Shape } = { new Circle { radius = 1 }, new Rect { w = 2, h = 3 } }
+-- `Default` writes `default()`. A field takes its declared default, a
+-- struct field its own `default()`, and the rest the zero of the type.
+@derive(Default, Clone)
+struct Loadout
+  weapon: string = 'sword'
+  level: number
+end
+
+@derive(Default, Clone)
+struct Save
+  coins: number
+  loadout: Loadout
+  badges: string[]
+end
+
+-- `Clone` is deep: a nested struct and an array come back as copies.
+const save = Save.default()
+local copy = save:clone()
+copy.loadout.level = 5
+copy.badges:push('first win')
+print(save.loadout.level, #save.badges) -- 0 0
+
+const v = new Vec2(1, 2) + new Vec2(3, 4)
+const shapes: { Shape } = { new Circle { radius = 1 }, new Rect { w = 2, h = 3 } }
 
 print(v:len(), tostring(v), v == Vec2.new(4, 6))
 print(shapes[1]:describe(), shapes[2]:describe())
