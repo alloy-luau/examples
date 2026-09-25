@@ -9,8 +9,8 @@ import * as React from '@packages/react' --@alloy-ignore
 
 const items: Item[] = [ { id = 1, name = 'Sword', count = 1 } :: Item ]
 
-local function App()
+local function app()
   return React.createElement(InventoryPanel, { items = items, title = 'Bag' })
 end
 
-return App
+return app
