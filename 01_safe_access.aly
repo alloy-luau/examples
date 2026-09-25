@@ -9,7 +9,7 @@ local function volume(settings: { volume: number? }?): number
 end
 
 -- `??=` assigns when the left side is nil. The index runs once.
-const cache: { [string]: number } = {}
+local cache: { [string]: number } = {}
 local function get_or_seed(key: string): number
   cache[key] ??= math.random()
   return cache[key]
