@@ -145,7 +145,7 @@ if RunService:IsClient() then
   pending:cancel()
   Damage.fire(Players.LocalPlayer, 10)
   JoinTeam.fire(Team.Red)
-  Position.fire(CFrame.new())
+  Position.fire(new CFrame())
   Heal.fire(50)
 
   Ping.on(function(sent_at: number)

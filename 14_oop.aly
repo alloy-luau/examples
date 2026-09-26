@@ -44,7 +44,7 @@ impl Health
 
   -- A function without `self` is a static function.
   function full(max: number): Health
-    return Health.new(max)
+    return new Health(max)
   end
 end
 
@@ -137,7 +137,7 @@ impl Character
   function new(player: Player): Character
     local self = new Character {
       player = player,
-      health = Health.new(100),
+      health = new Health(100),
       weapon = nil,
       connections = [],
     }

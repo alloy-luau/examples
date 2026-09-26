@@ -67,7 +67,7 @@ const both = seen:intersection(Set.from([ 3, 4, 5 ]))
 print(seen:has(2), both:len(), both:to_array())
 
 -- BitSet holds whole numbers at one bit each. It suits dense ids.
-local visited = BitSet.new(1024)
+local visited = new BitSet(1024)
 visited:add(7):add(40)
 for tile in visited do
   print(tile) -- 7, then 40
@@ -91,7 +91,7 @@ end
 print(2 in seen, 'ana' in scores, 'bc' in 'abc', not (9 in test))
 
 -- Symbol makes a unique key that no string can collide with.
-const CHILDREN = Symbol.new('Children')
+const CHILDREN = new Symbol('Children')
 const props = { [CHILDREN] = [], Name = 'x' }
 print(tostring(CHILDREN), props[CHILDREN])
 
@@ -105,13 +105,13 @@ local jobs = Queue.from([ 'load', 'spawn', 'greet' ])
 jobs:push('save')
 const next_job = jobs:pop()
 
-local open = Heap.new(function(a: { cost: number }, b: { cost: number }) return a.cost < b.cost end)
+local open = new Heap(function(a: { cost: number }, b: { cost: number }) return a.cost < b.cost end)
 open:push({ cost = 9 })
 open:push({ cost = 2 })
 const nearest = open:pop()
 
 -- Scope: a cleanup bag that `delete` drains, newest first.
-local scope = Scope.new()
+local scope = new Scope()
 const heartbeat = scope:add(game:GetService('RunService').Heartbeat:Connect(function() end))
 scope:add(function() print('scope closed') end)
 delete scope
