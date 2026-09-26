@@ -10,16 +10,16 @@ end
 -- A Roblox datatype. A foreign impl is project-wide, so it is exported.
 export impl Vector3
   function flat(self): Vector3
-    return Vector3.new(self.X, 0, self.Z)
+    return new Vector3(self.X, 0, self.Z)
   end
 
   function with_y(self, y: number): Vector3
-    return Vector3.new(self.X, y, self.Z)
+    return new Vector3(self.X, y, self.Z)
   end
 
   -- No self: a static, called as Vector3.origin(). `-> T` is `: T`.
   function origin() -> Vector3
-    return Vector3.new(0, 0, 0)
+    return new Vector3(0, 0, 0)
   end
 end
 
@@ -27,7 +27,7 @@ end
 export impl BasePart
   function fade(self, seconds: number): ()
     game:GetService('TweenService')
-      :Create(self, TweenInfo.new(seconds), { Transparency = 1 })
+      :Create(self, new TweenInfo(seconds), { Transparency = 1 })
       :Play()
   end
 end
@@ -59,7 +59,7 @@ end
 
 -- Usage. The analyzer sees the injected declarations, so these are
 -- ordinary typed calls.
-const position = Vector3.new(1, 2, 3)
+const position = new Vector3(1, 2, 3)
 const flat = position:flat():with_y(5)
 const origin = Vector3.origin()
 

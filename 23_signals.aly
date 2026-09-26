@@ -7,7 +7,7 @@ const RunService = game:GetService('RunService')
 
 -- A signal carries typed payloads. The annotation names them; a handler
 -- gets them typed.
-const damaged = Signal.new<<(Player, number)>>()
+const damaged = new Signal<<(Player, number)>>()
 
 const conn = damaged:Connect(function(player, amount)
   print(player.Name, 'took', amount)

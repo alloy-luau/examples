@@ -7,7 +7,7 @@ const Workspace = game:GetService('Workspace')
 -- emits: function move(part: BasePart, speed: number?, options: { [string]: unknown }?)
 --        if speed == nil then speed = 16 end if options == nil then options = {} end
 local function move(part: BasePart, speed: number = 16, options: { [string]: unknown } = {})
-  part.AssemblyLinearVelocity = Vector3.new(speed, 0, 0)
+  part.AssemblyLinearVelocity = new Vector3(speed, 0, 0)
   return options
 end
 
@@ -124,7 +124,7 @@ end
 -- Each field lands on its own line. `Parent` goes last.
 const part = new Instance('Part') {
   Name = 'Marker',
-  Size = Vector3.new(1, 1, 1),
+  Size = new Vector3(1, 1, 1),
   Anchored = true,
   Parent = Workspace,
 }
@@ -132,7 +132,7 @@ const part = new Instance('Part') {
 -- A struct constructs through `new` alone: the fields form when the
 -- struct writes no constructor, `new Name(...)` when its impl does.
 const menu2 = new Menu {
-  button = Instance.new('TextButton'),
+  button = new Instance('TextButton'),
   opens = 3,
 }
 

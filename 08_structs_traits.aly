@@ -62,7 +62,7 @@ end
 -- Add is __add, Eq is __eq, Display is __tostring.
 impl Add for Vec2
   function add(self, other: Vec2): Vec2
-    return Vec2.new(self.x + other.x, self.y + other.y)
+    return new Vec2(self.x + other.x, self.y + other.y)
   end
 end
 
@@ -110,6 +110,6 @@ print(save.loadout.level, #save.badges) -- 0 0
 const v = new Vec2(1, 2) + new Vec2(3, 4)
 const shapes: { Shape } = { new Circle { radius = 1 }, new Rect { w = 2, h = 3 } }
 
-print(v:len(), tostring(v), v == Vec2.new(4, 6))
+print(v:len(), tostring(v), v == new Vec2(4, 6))
 print(shapes[1]:describe(), shapes[2]:describe())
 print(show_all({ v }), biggest)
