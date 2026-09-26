@@ -13,7 +13,7 @@ type Props = {
 local function Row(props: { item: Item, on_select: ((Item) -> ())? })
   return (
     <TextButton
-      Size={UDim2.new(1, 0, 0, 24)}
+      Size={new UDim2(1, 0, 0, 24)}
       Activated={function()
         props.on_select?(props.item)
       end}
@@ -33,11 +33,11 @@ local function InventoryPanel(props: Props)
     <Frame Size={UDim2.fromScale(1, 1)} BackgroundTransparency={1}>
       <!-- a comment between tags -->
       <UIListLayout SortOrder={Enum.SortOrder.LayoutOrder} />
-      <TextLabel Size={UDim2.new(1, 0, 0, 32)}>{title}</TextLabel>
+      <TextLabel Size={new UDim2(1, 0, 0, 32)}>{title}</TextLabel>
       <TextLabel Visible={props.title ~= nil}>Showing {#props.items} items</TextLabel>
       {rows}
       <>
-        <UICorner CornerRadius={UDim.new(0, 8)} />
+        <UICorner CornerRadius={new UDim(0, 8)} />
       </>
       {if #props.items == 0 then <TextLabel>Empty</TextLabel> else nil}
       {match props.title with
