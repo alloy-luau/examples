@@ -1,4 +1,11 @@
-import { Serialize, Deserialize, rename, rename_all, skip, deny_unknown_fields } from '@alloy/std/serde'
+import {
+  Serialize,
+  Deserialize,
+  rename,
+  rename_all,
+  skip,
+  deny_unknown_fields,
+} from '@alloy/std/serde'
 import * as serde from '@alloy/std/serde'
 import { Attributes } from '@alloy/std/roblox'
 -- User-defined attributes: declared metadata with checked placement and
