@@ -1,2 +1,4 @@
 packages/
 .ember-patch/
+sourcemap.json
+tests/
