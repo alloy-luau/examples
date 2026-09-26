@@ -41,7 +41,7 @@ const spawn = workspace->Map->Spawns->Spawn1
 const points = workspace->'Spawn Points'
 const slot = workspace->`Slot{1}`
 local function child_named(name: string): Instance?
-  return workspace->[ name ]
+  return workspace->[name]
 end
 
 -- `=>` is WaitForChild. It throws on a nil left side, like any method.
